@@ -1,15 +1,43 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tlaghzal <tlaghzal@student.1337.ma>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/03/14 23:05:32 by tlaghzal          #+#    #+#             */
+/*   Updated: 2026/03/14 23:05:57 by tlaghzal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
-long long ft_atol(const char *str)
+int	ft_strlen(const char *s)
 {
-	long long res;
+	int	len;
 
-	int sign;
-	int i;
+	len = 0;
+	while (s[len])
+		len++;
+	return (len);
+}
+
+void	error_exit(const char *msg)
+{
+	write(2, msg, ft_strlen(msg));
+	exit(1);
+}
+
+long long	ft_atol(const char *str)
+{
+	long long	res;
+	int			sign;
+	int			i;
+
 	i = 0;
 	res = 0;
 	sign = 1;
-	while (str[i] == ' ' ||str[i] <= 13 && str[i] >= 9)
+	while (str[i] == ' ' || (str[i] <= 13 && str[i] >= 9))
 		i++;
 	if (str[i] == '-' || str[i] == '+')
 	{
@@ -18,28 +46,17 @@ long long ft_atol(const char *str)
 		i++;
 	}
 	while (str[i] >= '0' && str[i] <= '9')
-	{
-		res = res * 10 + (str[i] - '0');
-		i++;
-	}
+		res = res * 10 + (str[i++] - '0');
 	return (res * sign);
-
-}
-int ft_strlen(const char *s) {
-	int len = 0;
-	while (s[len])
-		len++;
-	return len;
 }
 
-void error_exit(const char *msg) {
-	write(2, msg, ft_strlen(msg));
-	exit(1);
-}
+long long	get_time_in_ms(void)
+{
+	struct timeval	tv;
+	long long		ms;
 
-int ft_strcmp(const char *s1, const char *s2) {
-	int i = 0;
-	while (s1[i] && s2[i] && s1[i] == s2[i])
-		i++;
-	return (unsigned char)s1[i] - (unsigned char)s2[i];
+	if (gettimeofday(&tv, NULL) == -1)
+		return (-1);
+	ms = (long long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
+	return (ms);
 }
