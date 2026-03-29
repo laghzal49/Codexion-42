@@ -16,9 +16,10 @@ void	coder_compile(t_coder *coder)
 {
 	if (should_stop(coder->all))
 		return ;
-	/* unsynchronized state update */
+	pthread_mutex_lock(&coder->cv_mu);
 	coder->time_to_die = get_time_in_ms() + \
 		coder->all->parms.time_to_burnout;
+	pthread_mutex_unlock(&coder->cv_mu);
 	log_print(coder, "is compiling");
 	smart_sleep(coder->all->parms.time_to_compile, coder->all);
 	pthread_mutex_lock(&coder->cv_mu);
