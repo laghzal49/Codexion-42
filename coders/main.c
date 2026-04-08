@@ -37,18 +37,21 @@ void	parsing(t_params *parse, char **av)
 		parse->is_edf = 1;
 	else
 		error_exit("Error: Invalid scheduler. Must be 'fifo' or 'edf'.\n");
-	printf("Parsed: %lld coders, scheduler enum: %d (0=FIFO, 1=EDF)\n",
+printf("Parsed: %lld coders, scheduler enum: %d (0=FIFO, 1=EDF)\n",
 		parse->num_coders, parse->is_edf);
 }
 
 int	main(int ac, char **av)
 {
 	t_sim	sim;
-	char *msg_error =  "Usage: ./main num_coders time_to_burnout time_to_compile time_to_debug "
-            "time_to_refactor num_compiles_req dongle_cooldown\n";
+	char	*msg_error;
+
+	msg_error = "Usage: ./main num_coders time_to_burnout time_to_compile "
+		"time_to_debug time_to_refactor num_compiles_req dongle_cooldown\n";
 	if (ac != 9)
 		error_exit(msg_error);
 	parsing(&sim.params, av);
-	return 0;
-
+	if (init_sim(&sim))
+		error_exit("Error: init sim Failed.\n");
+	return (0);
 }
