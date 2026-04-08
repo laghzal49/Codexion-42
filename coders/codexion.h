@@ -13,6 +13,7 @@
 #ifndef CODEXION_H
 # define CODEXION_H
 
+# include "garbge_colle/ft_malloc.h"
 # include <pthread.h>
 # include <sys/time.h>
 # include <stdio.h>
@@ -20,7 +21,6 @@
 # include <unistd.h>
 # include <string.h>
 
-/* Typedefs */
 typedef struct s_sim	t_sim;
 typedef struct s_coder	t_coder;
 typedef struct s_dongle	t_dongle;
@@ -37,9 +37,23 @@ typedef struct s_params
 	int			is_edf;
 }	t_params;
 
+typedef struct s_request
+{
+	t_coder		*coder;
+	long long	key;
+}	t_request;
+
+typedef struct s_pq_node
+{
+	t_request	*arr;
+	int			size;
+	int			capacity;
+}	t_pq;
+
 typedef struct s_dongle
 {
 	pthread_mutex_t	mutex;
+	t_pq			queue;
 	pthread_cond_t	cond;
 	int				available_flag;
 	long long		cooldown_timestamp;
@@ -69,6 +83,7 @@ typedef struct s_sim
 }	t_sim;
 
 /* Function prototypes */
+void		*coder_routine(void *arg);
 long long	get_time_in_ms(void);
 void		error_exit(const char *msg);
 long long	ft_atol(const char *str);
