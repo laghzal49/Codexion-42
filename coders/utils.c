@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/14 23:05:32 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/07 15:20:03 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/10 09:28:23 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,13 +50,3 @@ long long	ft_atol(const char *str)
 	return (res * sign);
 }
 
-long long	get_time_in_ms(void)
-{
-	struct timeval	tv;
-	long long		ms;
-
-	if (gettimeofday(&tv, NULL) == -1)
-		return (-1);
-	ms = (long long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
-	return (ms);
-}

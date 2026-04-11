@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 21:56:33 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/03/14 23:18:10 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/08 19:53:46 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	parsing(t_params *parse, char **av)
 		parse->is_edf = 1;
 	else
 		error_exit("Error: Invalid scheduler. Must be 'fifo' or 'edf'.\n");
-printf("Parsed: %lld coders, scheduler enum: %d (0=FIFO, 1=EDF)\n",
+	printf("Parsed: %lld coders, scheduler enum: %d (0=FIFO, 1=EDF)\n",
 		parse->num_coders, parse->is_edf);
 }
 
@@ -53,5 +53,6 @@ int	main(int ac, char **av)
 	parsing(&sim.params, av);
 	if (init_sim(&sim))
 		error_exit("Error: init sim Failed.\n");
+	free_all();
 	return (0);
 }
