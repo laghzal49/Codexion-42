@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/14 23:07:00 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/03/14 23:15:08 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/10 08:00:04 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ typedef struct s_sim	t_sim;
 typedef struct s_coder	t_coder;
 typedef struct s_dongle	t_dongle;
 
+
 typedef struct s_params
 {
 	long long	num_coders;
@@ -39,15 +40,14 @@ typedef struct s_params
 
 typedef struct s_request
 {
-	t_coder		*coder;
+	t_coder		*coder_id;
 	long long	key;
 }	t_request;
 
 typedef struct s_pq_node
 {
-	t_request	*arr;
+	t_request	arr[2];
 	int			size;
-	int			capacity;
 }	t_pq;
 
 typedef struct s_dongle
@@ -93,5 +93,9 @@ int			init_sim_core(t_sim *sim);
 int			init_alloc(t_sim *sim);
 int			init_dongles(t_sim *sim);
 int			init_coders(t_sim *sim);
+int     pq_push(t_pq *pq, t_request req);
+t_request pq_pop(t_pq *pq);
+t_request *pq_peek(t_pq *pq);
+void	swap(t_request *a, t_request *b);
 
 #endif
