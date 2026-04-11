@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/14 23:07:00 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/10 08:00:04 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/11 10:49:56 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ typedef struct s_sim
 
 /* Function prototypes */
 void		*coder_routine(void *arg);
+void print_state(t_coder *coder, const char *state);
 long long	get_time_in_ms(void);
 void		error_exit(const char *msg);
 long long	ft_atol(const char *str);
@@ -97,5 +98,6 @@ int     pq_push(t_pq *pq, t_request req);
 t_request pq_pop(t_pq *pq);
 t_request *pq_peek(t_pq *pq);
 void	swap(t_request *a, t_request *b);
+void    ft_usleep(long long time_to_sleep);
 
 #endif
