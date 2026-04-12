@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   codexion.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tlaghzal <tlaghzal@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/10 21:56:33 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/08 19:53:46 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/11 16:06:50 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,10 @@ int	main(int ac, char **av)
 	parsing(&sim.params, av);
 	if (init_sim(&sim))
 		error_exit("Error: init sim Failed.\n");
+  if (start_sim(&sim) != 0)
+		return (1);
+  monitor_routine(&sim);
+  join_sim(&sim);
 	free_all();
 	return (0);
 }

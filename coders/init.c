@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/10 08:45:52 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/10 08:56:34 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/11 16:08:55 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,11 +58,11 @@ int init_coders(t_sim *sim)
   int   i;
 
   i = 0;
-  while (i < sim->coders.params.num_coders)
+  while (i < sim->params.num_coders)
   {
     sim->coders[i].id = i + 1;
     sim->coders[i].compile_count = 0;
-    sim->coders[i].last_compile = start_time_ms();
+    sim->coders[i].last_compile = get_time_in_ms();
     sim->coders[i].sim = sim;
     sim->coders[i].left_dongle = &sim->dongles[i];
     sim->coders[i].right_dongle = &sim->dongles[(i + 1) % sim->params.num_coders];

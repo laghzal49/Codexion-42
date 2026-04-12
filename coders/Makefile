@@ -19,7 +19,8 @@ SRCS        = codexion.c \
               time.c \
               pq.c \
               utils.c \
-              garbge_colle/ft_malloc.c
+              garbge_colle/ft_malloc.c \
+							dongle.c
 
 # Object files
 OBJS        = $(SRCS:.c=.o)
