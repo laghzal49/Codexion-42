@@ -50,3 +50,17 @@ long long	ft_atol(const char *str)
 	return (res * sign);
 }
 
+void	print_state(t_coder *coder, const char *state)
+{
+	long long	elapsed;
+
+	pthread_mutex_lock(&coder->sim->log_mutex);
+	pthread_mutex_lock(&coder->sim->stop_mutex);
+	if (coder->sim->stop_flag == 0)
+	{
+		elapsed = get_time_in_ms() - coder->sim->start_time_ms;
+		printf("%lld %d %s\n", elapsed, coder->id, state);
+	}
+	pthread_mutex_unlock(&coder->sim->stop_mutex);
+	pthread_mutex_unlock(&coder->sim->log_mutex);
+}

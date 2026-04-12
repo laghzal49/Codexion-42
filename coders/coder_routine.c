@@ -6,25 +6,29 @@
 /*   By: tlaghzal <tlaghzal@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/10 10:41:53 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/11 19:04:13 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/12 16:05:00 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 #include <pthread.h>
 
-void    print_state(t_coder *coder, const char *state)
+static void	drop_all_dongles(t_coder *coder)
 {
-  pthread_mutex_lock(&coder->sim->log_mutex);
-  pthread_mutex_lock(&coder->sim->stop_mutex);
-  if (coder->sim->stop_flag == 0)
-    printf("%lld %d %s\n", get_time_in_ms() - coder->sim->start_time_ms, coder->id, state);
-  pthread_mutex_unlock(&coder->sim->stop_mutex);
-  pthread_mutex_unlock(&coder->sim->log_mutex);
+	if (coder->id % 2 == 0)
+	{
+		put_dongles(coder, coder->left_dongle);
+		put_dongles(coder, coder->right_dongle);
+	}
+	else
+	{
+		put_dongles(coder, coder->right_dongle);
+		put_dongles(coder, coder->left_dongle);
+	}
 }
-void action_compile(t_coder *coder)
+
+void	action_compile(t_coder *coder, t_params params)
 {
-	// 1. Grab Dongles safely
 	if (coder->id % 2 == 0)
 	{
 		take_dongles(coder, coder->right_dongle);
@@ -35,41 +39,29 @@ void action_compile(t_coder *coder)
 		take_dongles(coder, coder->left_dongle);
 		take_dongles(coder, coder->right_dongle);
 	}
-	
-	// 2. Do the work
 	print_state(coder, "is compiling");
-	
 	pthread_mutex_lock(&coder->sim->stop_mutex);
 	coder->last_compile = get_time_in_ms();
 	pthread_mutex_unlock(&coder->sim->stop_mutex);
-	
-	ft_usleep(coder->sim->params.time_to_compile);
-	
-	// PROTECT THE COUNTER!
+	ft_smart_sleep(coder, params.time_to_compile);
 	pthread_mutex_lock(&coder->sim->stop_mutex);
 	coder->compile_count++;
 	pthread_mutex_unlock(&coder->sim->stop_mutex);
-	
-	// 3. Drop Dongles safely (Reverse order)
-	if (coder->id % 2 == 0)
-	{
-		put_dongles(coder, coder->left_dongle);
-		put_dongles(coder, coder->right_dongle);
-	}
-	else
-	{
-		put_dongles(coder, coder->right_dongle);
-		put_dongles(coder, coder->left_dongle);
-	}
+	drop_all_dongles(coder);
 }
-void    action_rest(t_coder *coder)
+
+void	action_debug(t_coder *coder, t_params params)
 {
 	print_state(coder, "is debugging");
-	ft_usleep(coder->sim->params.time_to_debug);
-	
-	print_state(coder, "is refactoring");
-	ft_usleep(coder->sim->params.time_to_refactor);
+	ft_smart_sleep(coder, params.time_to_debug);
 }
+
+void	action_refactor(t_coder *coder, t_params params)
+{
+	print_state(coder, "is refactoring");
+	ft_smart_sleep(coder, params.time_to_refactor);
+}
+
 void	*coder_routine(void *arg)
 {
 	t_coder	*coder;
@@ -77,23 +69,18 @@ void	*coder_routine(void *arg)
 	coder = (t_coder *)arg;
 	if (coder->id % 2 == 0)
 		ft_usleep(10);
-		
 	while (1)
 	{
-		// 1. Stop check
 		pthread_mutex_lock(&coder->sim->stop_mutex);
 		if (coder->sim->stop_flag == 1)
 		{
 			pthread_mutex_unlock(&coder->sim->stop_mutex);
-			break;
+			break ;
 		}
 		pthread_mutex_unlock(&coder->sim->stop_mutex);
-
-		// 2. Do actions
-		action_compile(coder);
-		action_rest(coder);
-		
-		// MAKE SURE THERE IS NOTHING ELSE HERE!
+		action_compile(coder, coder->sim->params);
+		action_debug(coder, coder->sim->params);
+		action_refactor(coder, coder->sim->params);
 	}
 	return (NULL);
 }

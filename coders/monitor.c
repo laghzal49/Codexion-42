@@ -22,7 +22,7 @@ int	check_death(t_sim *sim, int i)
 	if (time_since_compl >= sim->params.time_to_burnout)
 	{
 		pthread_mutex_lock(&sim->log_mutex);
-		printf("%lld %d burned out\n", 
+		printf("%lld %d burned out\n",
 			get_time_in_ms() - sim->start_time_ms, sim->coders[i].id);
 		sim->stop_flag = 1;
 		pthread_mutex_unlock(&sim->log_mutex);
@@ -33,7 +33,7 @@ int	check_death(t_sim *sim, int i)
 
 int	check_all_finished(t_sim *sim, int finished)
 {
-	if (sim->params.compiles_required > 0 
+	if (sim->params.compiles_required > 0
 		&& finished == sim->params.num_coders)
 	{
 		pthread_mutex_lock(&sim->stop_mutex);
@@ -59,7 +59,7 @@ int	check_coders(t_sim *sim)
 			pthread_mutex_unlock(&sim->stop_mutex);
 			return (1);
 		}
-		if (sim->params.compiles_required > 0 
+		if (sim->params.compiles_required > 0
 			&& sim->coders[i].compile_count >= sim->params.compiles_required)
 			finished++;
 		pthread_mutex_unlock(&sim->stop_mutex);
