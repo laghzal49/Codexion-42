@@ -53,10 +53,11 @@ int	main(int ac, char **av)
 	parsing(&sim.params, av);
 	if (init_sim(&sim))
 		error_exit("Error: init sim Failed.\n");
-  if (start_sim(&sim) != 0)
+	if (start_sim(&sim) != 0)
 		return (1);
-  monitor_routine(&sim);
-  join_sim(&sim);
+	monitor_routine(&sim);
+	join_sim(&sim);
+	cleanup_sim(&sim);
 	free_all();
 	return (0);
 }
