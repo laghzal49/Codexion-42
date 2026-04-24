@@ -3,59 +3,109 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlaghzal <tlaghzal@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/12 20:37:08 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/13 17:48:26 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/24 13:51:08 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-void    *init_coders(t_all *all)
+static int	init_sync(t_all *all)
 {
-  int   i;
-  int   next_id;
-
-  i = 0;
-  all->coder = malloc(sizeof(t_coder) * all->parms.num_coders);
-  if (!all->coder)
-    return (NULL);
-  while (i < all->parms.num_coders)
-  {
-    all->coder[i].coder_id = i;
-    all->coder[i].complie_count = 0;
-    all->coder[i].last_compile = get_time_in_ms();
-    all->coder[i].right_dongle = &all->dongles[i];
-    next_id = (i + 1) % all->parms.num_coders;
-    all->coder[i].left_dongle = &all->dongles[next_id];
-    i++;
-  }
-  return NULL;
+	if (pthread_mutex_init(&all->log_mutex, NULL) != 0)
+		return (1);
+	all->log_mutex_ready = 1;
+	if (pthread_mutex_init(&all->req_mu, NULL) != 0)
+		return (1);
+	all->req_mu_ready = 1;
+	if (pthread_cond_init(&all->req_cv, NULL) != 0)
+		return (1);
+	all->req_cv_ready = 1;
+	return (0);
 }
 
-void    *init_dongle(t_all *all)
+static int	init_alloc(t_all *all)
 {
-  int   i;
-
-  i = 0;
-  all->dongles = malloc(sizeof(t_dongle) * all->parms.num_coders);
-  if (!all->dongles)
-    return (NULL);
-  while (i < all->parms.num_coders)
-  {
-    all->dongles->in_use = 0;
-    if (pthread_mutex_init(&all->dongles[i].mutex, NULL))
-      return (NULL);
-    all->dongles->cooldown = all->parms.dongle_cooldown;
-    i++;
-  }
+	all->dongles = malloc(sizeof(t_dongle) * all->parms.num_coders);
+	if (!all->dongles)
+		return (1);
+	all->coder = malloc(sizeof(t_coder) * all->parms.num_coders);
+	if (!all->coder)
+	{
+		free(all->dongles);
+		all->dongles = NULL;
+		return (1);
+	}
+	return (0);
 }
 
-int init_all(t_all *all)
+static int	init_dongles(t_all *all)
 {
-  if (init_coders(all))
-    return (1);
-  if (init_dongle(all))
-    return (1);
+	int	index;
+
+	index = 0;
+	while (index < all->parms.num_coders)
+	{
+		all->dongles[index].in_use = 0;
+		all->dongles[index].cooldown = 0;
+		all->dongles[index].id = index;
+		if (pthread_mutex_init(&all->dongles[index].mutex, NULL) != 0)
+			return (cleanup_dongles(all, index), 1);
+		if (pthread_cond_init(&all->dongles[index].cond, NULL) != 0)
+		{
+			pthread_mutex_destroy(&all->dongles[index].mutex);
+			return (cleanup_dongles(all, index), 1);
+		}
+		index++;
+	}
+	return (0);
+}
+
+static int	init_coders(t_all *all)
+{
+	int	index;
+	int	next_index;
+
+	index = 0;
+	while (index < all->parms.num_coders)
+	{
+		next_index = (index + 1) % all->parms.num_coders;
+		all->coder[index].coder_id = index + 1;
+		all->coder[index].compile_count = 0;
+		all->coder[index].last_compile = get_time_in_ms();
+		all->coder[index].right_dongle = &all->dongles[index];
+		all->coder[index].left_dongle = &all->dongles[next_index];
+		all->coder[index].target_dongle = NULL;
+		all->coder[index].granted = 0;
+		all->coder[index].has_first_dongle = 0;
+		all->coder[index].request_seq = 0;
+		all->coder[index].all = all;
+		if (pthread_mutex_init(&all->coder[index].cv_mu, NULL) != 0)
+			return (1);
+		if (pthread_cond_init(&all->coder[index].cv, NULL) != 0)
+			return (pthread_mutex_destroy(&all->coder[index].cv_mu), 1);
+		index++;
+	}
+	return (0);
+}
+
+int	init_all(t_all *all)
+{
+	if (init_sync(all) != 0)
+		return (1);
+	all->heap = heap_init((int)all->parms.num_coders, all->parms.is_edf);
+	if (!all->heap || init_alloc(all) != 0 || init_dongles(all) != 0
+		|| init_coders(all) != 0)
+	{
+		cleanup_dongles(all, all->parms.num_coders);
+		free(all->coder);
+		all->coder = NULL;
+		heap_destroy(all->heap);
+		all->heap = NULL;
+		return (1);
+	}
+	all->request_seq = 0;
+	return (0);
 }

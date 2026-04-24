@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tlaghzal <tlaghzal@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/14 23:05:32 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/12 19:27:41 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/24 13:53:46 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,16 @@ void	error_exit(const char *msg)
 {
 	write(2, msg, (size_t)ft_strlen(msg));
 	exit(1);
+}
+
+void	print_state(t_coder *coder, const char *state)
+{
+	long long	now;
+
+	pthread_mutex_lock(&coder->all->log_mutex);
+	now = get_time_in_ms() - coder->all->start_time_ms;
+	printf("%lld %lld %s\n", now, coder->coder_id, state);
+	pthread_mutex_unlock(&coder->all->log_mutex);
 }
 
 long long	ft_atol(const char *str)
@@ -49,4 +59,3 @@ long long	ft_atol(const char *str)
 		res = res * 10 + (str[i++] - '0');
 	return (res * sign);
 }
-
