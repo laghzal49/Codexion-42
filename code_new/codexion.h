@@ -22,10 +22,14 @@
 # include <string.h>
 # include <sys/time.h>
 # include <unistd.h>
-
 # define FIFO 0
 # define EDF 1
-# define ERROREDF "Error: Invalid scheduler. Must be 'fifo', 'rr' or 'edf'.\n"
+# define ERROREDF "Error: Invalid scheduler. Must be 'fifo' or 'edf'.\n"
+# define NOFLOAT "Error: Invalid u need number not float"
+# define CHECK "Usage: ./Codexion num_coders time_to_burno time_to_compile time_to_debug \
+	time_to_refactor num_compiles_req dongle_cooldown scheduler\n"
+
+
 
 typedef struct s_coder	t_coder;
 typedef struct s_heap	t_heap;
@@ -138,7 +142,7 @@ void		heap_remove_at(t_heap *heap, int index);
 void		from_ms_to_timespec(struct timespec *time_spec, long long time_ms);
 uint64_t	from_timeval_to_ms(struct timeval time_value);
 uint64_t	get_current_time_ms(void);
+int	valdite_number(const char *s);
 
-extern const char		g_usage[];
 
 #endif

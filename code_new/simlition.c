@@ -63,7 +63,7 @@ static int	has_burned_out(t_all *all, int index, long long current_time)
 	pthread_mutex_unlock(&all->coder[index].cv_mu);
 	if (compile_count >= all->parms.compiles_required)
 		return (0);
-	if (current_time <= time_to_die + 60)
+	if (current_time <= time_to_die)
 		return (0);
 	set_stop(all);
 	pthread_mutex_lock(&all->log_mutex);

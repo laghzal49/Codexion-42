@@ -6,15 +6,11 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 17:09:20 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/24 13:51:10 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/26 16:28:23 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-
-const char	g_usage[] = "Usage: ./Codexion num_coders time_to_burnout " \
-	"time_to_compile time_to_debug time_to_refactor " \
-	"num_compiles_req dongle_cooldown scheduler\n";
 
 static void	validate_numeric_args(char **argv)
 {
@@ -23,6 +19,8 @@ static void	validate_numeric_args(char **argv)
 	index = 1;
 	while (index <= 7)
 	{
+		if (!valdite_number(argv[index]))
+			error_exit(NOFLOAT);
 		if (index <= 5 && ft_atol(argv[index]) <= 0)
 			error_exit("Error: Invalid numeric arguments. Must be positive.\n");
 		if (index >= 6 && ft_atol(argv[index]) < 0)
@@ -44,7 +42,7 @@ static void	parse_values(t_params *params, char **argv)
 
 static void	parse_scheduler(t_params *params, char **argv)
 {
-	if (strcmp(argv[8], "fifo") == 0 || strcmp(argv[8], "rr") == 0)
+	if (strcmp(argv[8], "fifo") == 0)
 		params->is_edf = FIFO;
 	else if (strcmp(argv[8], "edf") == 0)
 		params->is_edf = EDF;
@@ -61,7 +59,8 @@ void	parsing(t_params *params, char **argv)
 
 int	check_parsing(int argc)
 {
+
 	if (argc != 9)
-		error_exit(g_usage);
+		error_exit(CHECK);
 	return (0);
 }

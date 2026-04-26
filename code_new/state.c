@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
+#include <pthread.h>
 
 void	coder_compile(t_coder *coder)
 {
@@ -58,6 +59,6 @@ void	put_dongle(t_coder *coder)
 		second->in_use = 0;
 		second->cooldown = now + coder->all->parms.dongle_cooldown;
 	}
-	pthread_cond_signal(&all->req_cv);
+	pthread_cond_broadcast(&all->req_cv);
 	pthread_mutex_unlock(&all->req_mu);
 }

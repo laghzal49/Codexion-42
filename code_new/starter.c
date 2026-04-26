@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
+#include <pthread.h>
 
 static void	set_start_state(t_all *all)
 {
@@ -18,7 +19,9 @@ static void	set_start_state(t_all *all)
 	long long	start;
 
 	start = get_time_in_ms();
+	pthread_mutex_lock(&all->req_mu);
 	all->start_time_ms = start;
+	pthread_mutex_unlock(&all->req_mu);
 	index = 0;
 	while (index < all->parms.num_coders)
 	{

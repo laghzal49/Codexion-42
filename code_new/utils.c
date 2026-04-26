@@ -38,6 +38,24 @@ void	print_state(t_coder *coder, const char *state)
 	pthread_mutex_unlock(&coder->all->log_mutex);
 }
 
+int	valdite_number(const char *s)
+{
+	int	i;
+
+	i = 0;
+	if (s[i] == '+' || s[i] == '-')
+		i++;
+	if (!s[i])
+		return (1);
+	while (s[i])
+	{
+		if (s[i] < '0' || s[i] > '9')
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
 long long	ft_atol(const char *str)
 {
 	long long	res;

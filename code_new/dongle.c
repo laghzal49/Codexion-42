@@ -17,7 +17,7 @@ void	request_dongle(t_coder *coder, t_dongle *dongle);
 
 static void	select_order(t_coder *coder, t_dongle **first, t_dongle **second)
 {
-	if (coder->left_dongle->id < coder->right_dongle->id)
+	if (coder->left_dongle->id % 2 != 0)
 	{
 		*first = coder->left_dongle;
 		*second = coder->right_dongle;
@@ -95,7 +95,6 @@ void	take_dongles(t_coder *coder)
 	{
 		request_dongle(coder, first);
 		coder->has_first_dongle = 1;
-		print_state(coder, "has taken a dongle");
 		if (should_stop(coder->all))
 		{
 			coder->has_first_dongle = 0;
@@ -103,6 +102,7 @@ void	take_dongles(t_coder *coder)
 		}
 		if (request_second_dongle(coder, first, second) == 0)
 			continue ;
+		print_state(coder, "has taken a dongle");
 		print_state(coder, "has taken a dongle");
 		return ;
 	}
