@@ -6,14 +6,14 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/22 17:45:23 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/24 14:48:08 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/28 18:18:42 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 #include <pthread.h>
 
-void	log_print(t_coder *coder, const char *action)
+void	log_print(t_dev *coder, const char *action)
 {
 	long long	timestamp;
 
@@ -23,7 +23,8 @@ void	log_print(t_coder *coder, const char *action)
 	pthread_mutex_unlock(&coder->all->log_mutex);
 }
 
-static void	run_cycle(t_coder *coder)
+
+static void	run_cycle(t_dev *coder)
 {
 	coder_compile(coder);
 	if (!should_stop(coder->all))
@@ -33,10 +34,10 @@ static void	run_cycle(t_coder *coder)
 void	*coder_routine(void *arg)
 {
 	long long	current_start_time;
-	t_coder		*coder;
+	t_dev		*coder;
 	int			is_done;
 
-	coder = (t_coder *)arg;
+	coder = (t_dev *)arg;
 	while (!should_stop(coder->all))
 	{
 		pthread_mutex_lock(&coder->cv_mu);

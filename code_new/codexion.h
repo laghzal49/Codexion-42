@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/12 19:16:10 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/24 13:56:05 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/28 18:07:45 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,10 @@
 
 
 
-typedef struct s_coder	t_coder;
-typedef struct s_heap	t_heap;
+typedef struct s_dev			t_dev;
+typedef struct s_scheduler	t_scheduler;
 
-typedef struct s_params
+typedef struct s_config
 {
 	long long	num_coders;
 	long long	time_to_burnout;
@@ -44,52 +44,51 @@ typedef struct s_params
 	long long	compiles_required;
 	long long	dongle_cooldown;
 	int			is_edf;
-}	t_params;
+}	t_config;
 
-typedef struct s_dongle
+typedef struct s_tool
 {
-	pthread_cond_t	cond;
-	pthread_mutex_t	mutex;
 	int				in_use;
 	long long		cooldown;
 	int				id;
-}	t_dongle;
+}	t_tool;
 
-typedef struct s_heap
+typedef struct s_scheduler
 {
-	t_coder	**items;
+	t_dev	**items;
 	int		max_size;
 	int		size;
 	int		is_edf;
-}	t_heap;
+}	t_scheduler;
 
-typedef struct s_all
+typedef struct s_app
 {
-	t_params		parms;
-	t_dongle		*dongles;
-	t_coder			*coder;
-	t_heap			*heap;
+	t_config		parms;
+	t_tool			*dongles;
+	t_dev				*coder;
+	t_scheduler		*heap;
 	pthread_t		manager_thread;
 	pthread_t		monitor_thread;
 	long long		start_time_ms;
 	int				stop_flag;
 	int				finished_coders;
 	long long		request_seq;
+	int				stop_requested;
 	pthread_mutex_t	req_mu;
 	pthread_cond_t	req_cv;
 	pthread_mutex_t	log_mutex;
 	int				req_mu_ready;
 	int				req_cv_ready;
 	int				log_mutex_ready;
-}	t_all;
+}	t_app;
 
-typedef struct s_coder
+typedef struct s_dev
 {
 	long long		coder_id;
 	long long		time_to_die;
-	t_dongle		*left_dongle;
-	t_dongle		*right_dongle;
-	t_dongle		*target_dongle;
+	t_tool			*left_dongle;
+	t_tool			*right_dongle;
+	t_tool			*target_dongle;
 	int				granted;
 	int				has_first_dongle;
 	long long		request_seq;
@@ -97,47 +96,52 @@ typedef struct s_coder
 	pthread_t		thread;
 	pthread_mutex_t	cv_mu;
 	int				compile_count;
-	long long		last_compile;
-	t_all			*all;
-}	t_coder;
+	t_app				*all;
+}	t_dev;
 
-void		coder_compile(t_coder *coder);
+typedef t_config	t_params;
+typedef t_tool		t_dongle;
+typedef t_scheduler	t_heap;
+typedef t_app		t_all;
+typedef t_dev		t_coder;
+
+void		coder_compile(t_dev *coder);
 int			check_parsing(int argc);
-void		parsing(t_params *params, char **argv);
-void		coder_other(t_coder *coder);
+void		parsing(t_config *params, char **argv);
+void		coder_other(t_dev *coder);
 int			ft_strlen(const char *string);
 void		error_exit(const char *message);
-void		log_print(t_coder *coder, const char *action);
-void		print_state(t_coder *coder, const char *state);
+void		log_print(t_dev *coder, const char *action);
+void		print_state(t_dev *coder, const char *state);
 long long	ft_atol(const char *str);
 long long	get_time_in_ms(void);
 void		ft_usleep(long long time_to_sleep);
-int			init_all(t_all *all);
-int			start_and_join_coders(t_all *all);
+int			init_all(t_app *all);
+int			start_and_join_coders(t_app *all);
 void		*coder_routine(void *arg);
 void		*monitor_routine(void *arg);
-int			should_stop(t_all *all);
-void		set_stop(t_all *all);
-void		mark_coder_finished(t_all *all);
+int			should_stop(t_app *all);
+void		set_stop(t_app *all);
+void		mark_coder_finished(t_app *all);
 void		*manager_routine(void *arg);
 
-void		cleanup_all(t_all *all);
-void		cleanup_dongles(t_all *all, int num_coders);
-void		take_dongles(t_coder *coder);
-void		put_dongle(t_coder *coder);
-void		smart_sleep(long long time_to_sleep, t_all *all);
-int			request_second_dongle(t_coder *coder, t_dongle *first,
-				t_dongle *second);
+void		cleanup_all(t_app *all);
+void		cleanup_dongles(t_app *all, int num_coders);
+void		take_dongles(t_dev *coder);
+void		put_dongle(t_dev *coder);
+void		smart_sleep(long long time_to_sleep, t_app *all);
+int			request_second_dongle(t_dev *coder, t_tool *first,
+				t_tool *second);
 
-t_heap		*heap_init(int max_size, int is_edf);
-void		heap_destroy(t_heap *heap);
-int			heap_is_empty(t_heap *heap);
-int			heap_is_full(t_heap *heap);
-int			heap_insert(t_heap *heap, t_coder *coder);
-int			heap_pop(t_heap *heap, t_coder **out);
-void		bubble_up(t_heap *heap, int index);
-void		bubble_down(t_heap *heap, int index, int size);
-void		heap_remove_at(t_heap *heap, int index);
+t_scheduler	*heap_init(int max_size, int is_edf);
+void		heap_destroy(t_scheduler *heap);
+int			heap_is_empty(t_scheduler *heap);
+int			heap_is_full(t_scheduler *heap);
+int			heap_insert(t_scheduler *heap, t_dev *coder);
+int			heap_pop(t_scheduler *heap, t_dev **out);
+void		bubble_up(t_scheduler *heap, int index);
+void		bubble_down(t_scheduler *heap, int index, int size);
+void		heap_remove_at(t_scheduler *heap, int index);
 
 void		from_ms_to_timespec(struct timespec *time_spec, long long time_ms);
 uint64_t	from_timeval_to_ms(struct timeval time_value);

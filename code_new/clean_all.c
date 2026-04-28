@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/21 13:52:22 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/24 13:28:48 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/28 18:04:46 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,6 @@ void	cleanup_dongles(t_all *all, int num_coders)
 	index = 0;
 	while (index < num_coders)
 	{
-		pthread_cond_destroy(&all->dongles[index].cond);
-		pthread_mutex_destroy(&all->dongles[index].mutex);
 		index++;
 	}
 }

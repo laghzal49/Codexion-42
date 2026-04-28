@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 17:09:20 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/26 16:28:23 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/28 18:17:57 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static void	validate_numeric_args(char **argv)
 	index = 1;
 	while (index <= 7)
 	{
-		if (!valdite_number(argv[index]))
+		if (valdite_number(argv[index]))
 			error_exit(NOFLOAT);
 		if (index <= 5 && ft_atol(argv[index]) <= 0)
 			error_exit("Error: Invalid numeric arguments. Must be positive.\n");
@@ -29,7 +29,7 @@ static void	validate_numeric_args(char **argv)
 	}
 }
 
-static void	parse_values(t_params *params, char **argv)
+static void	parse_values(t_config *params, char **argv)
 {
 	params->num_coders = ft_atol(argv[1]);
 	params->time_to_burnout = ft_atol(argv[2]);
@@ -40,7 +40,7 @@ static void	parse_values(t_params *params, char **argv)
 	params->dongle_cooldown = ft_atol(argv[7]);
 }
 
-static void	parse_scheduler(t_params *params, char **argv)
+static void	parse_scheduler(t_config *params, char **argv)
 {
 	if (strcmp(argv[8], "fifo") == 0)
 		params->is_edf = FIFO;
@@ -50,7 +50,7 @@ static void	parse_scheduler(t_params *params, char **argv)
 		error_exit(ERROREDF);
 }
 
-void	parsing(t_params *params, char **argv)
+void	parsing(t_config *params, char **argv)
 {
 	validate_numeric_args(argv);
 	parse_values(params, argv);

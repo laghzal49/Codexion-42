@@ -6,13 +6,13 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/12 20:37:08 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/24 13:51:08 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/28 18:18:02 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-static int	init_sync(t_all *all)
+static int	init_sync(t_app *all)
 {
 	if (pthread_mutex_init(&all->log_mutex, NULL) != 0)
 		return (1);
@@ -26,12 +26,12 @@ static int	init_sync(t_all *all)
 	return (0);
 }
 
-static int	init_alloc(t_all *all)
+static int	init_alloc(t_app *all)
 {
-	all->dongles = malloc(sizeof(t_dongle) * all->parms.num_coders);
+	all->dongles = malloc(sizeof(t_tool) * all->parms.num_coders);
 	if (!all->dongles)
 		return (1);
-	all->coder = malloc(sizeof(t_coder) * all->parms.num_coders);
+	all->coder = malloc(sizeof(t_dev) * all->parms.num_coders);
 	if (!all->coder)
 	{
 		free(all->dongles);
@@ -41,7 +41,7 @@ static int	init_alloc(t_all *all)
 	return (0);
 }
 
-static int	init_dongles(t_all *all)
+static int	init_dongles(t_app *all)
 {
 	int	index;
 
@@ -51,19 +51,12 @@ static int	init_dongles(t_all *all)
 		all->dongles[index].in_use = 0;
 		all->dongles[index].cooldown = 0;
 		all->dongles[index].id = index;
-		if (pthread_mutex_init(&all->dongles[index].mutex, NULL) != 0)
-			return (cleanup_dongles(all, index), 1);
-		if (pthread_cond_init(&all->dongles[index].cond, NULL) != 0)
-		{
-			pthread_mutex_destroy(&all->dongles[index].mutex);
-			return (cleanup_dongles(all, index), 1);
-		}
 		index++;
 	}
 	return (0);
 }
 
-static int	init_coders(t_all *all)
+static int	init_coders(t_app *all)
 {
 	int	index;
 	int	next_index;
@@ -74,7 +67,6 @@ static int	init_coders(t_all *all)
 		next_index = (index + 1) % all->parms.num_coders;
 		all->coder[index].coder_id = index + 1;
 		all->coder[index].compile_count = 0;
-		all->coder[index].last_compile = get_time_in_ms();
 		all->coder[index].right_dongle = &all->dongles[index];
 		all->coder[index].left_dongle = &all->dongles[next_index];
 		all->coder[index].target_dongle = NULL;
@@ -91,7 +83,7 @@ static int	init_coders(t_all *all)
 	return (0);
 }
 
-int	init_all(t_all *all)
+int	init_all(t_app *all)
 {
 	if (init_sync(all) != 0)
 		return (1);

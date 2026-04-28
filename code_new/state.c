@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/23 12:32:46 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/24 14:24:31 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/28 18:04:47 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ void	coder_compile(t_coder *coder)
 		return ;
 	log_print(coder, "is compiling");
 	pthread_mutex_lock(&coder->cv_mu);
-	coder->last_compile = get_time_in_ms();
 	coder->compile_count++;
 	coder->time_to_die = get_time_in_ms() + \
 		coder->all->parms.time_to_burnout;

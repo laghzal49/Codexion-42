@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 14:06:00 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/24 14:48:11 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/28 18:02:09 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,9 @@ int	should_stop(t_all *all)
 
 void	set_stop(t_all *all)
 {
-	int	index;
-
 	pthread_mutex_lock(&all->req_mu);
-	all->stop_flag = 1;
+	all->stop_requested = 1;
 	pthread_cond_broadcast(&all->req_cv);
-	index = 0;
-	while (index < all->parms.num_coders)
-	{
-		pthread_cond_broadcast(&all->coder[index].cv);
-		index++;
-	}
 	pthread_mutex_unlock(&all->req_mu);
 }
 
@@ -46,10 +38,14 @@ void	mark_coder_finished(t_all *all)
 	pthread_mutex_lock(&all->req_mu);
 	all->finished_coders++;
 	if (all->finished_coders >= all->parms.num_coders)
+	{
+		all->stop_requested = 1;
+		pthread_cond_broadcast(&all->req_cv);
 		is_complete = 1;
+	}
 	pthread_mutex_unlock(&all->req_mu);
 	if (is_complete)
-		set_stop(all);
+		return ;
 }
 
 static int	has_burned_out(t_all *all, int index, long long current_time)

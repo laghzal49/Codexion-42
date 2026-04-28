@@ -6,16 +6,16 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/19 18:32:05 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/24 14:48:03 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/28 18:18:02 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 #include <pthread.h>
 
-void	request_dongle(t_coder *coder, t_dongle *dongle);
+void	request_dongle(t_dev *coder, t_tool *dongle);
 
-static void	select_order(t_coder *coder, t_dongle **first, t_dongle **second)
+static void	select_order(t_dev *coder, t_tool **first, t_tool **second)
 {
 	if (coder->left_dongle->id % 2 != 0)
 	{
@@ -29,14 +29,14 @@ static void	select_order(t_coder *coder, t_dongle **first, t_dongle **second)
 	}
 }
 
-static void	release_first_dongle(t_coder *coder, t_dongle *first)
+static void	release_first_dongle(t_dev *coder, t_tool *first)
 {
 	first->in_use = 0;
 	coder->has_first_dongle = 0;
-	pthread_cond_signal(&coder->all->req_cv);
+	pthread_cond_broadcast(&coder->all->req_cv);
 }
 
-int	request_second_dongle(t_coder *coder, t_dongle *first, t_dongle *second)
+int	request_second_dongle(t_dev *coder, t_tool *first, t_tool *second)
 {
 	long long	now;
 
@@ -61,23 +61,18 @@ int	request_second_dongle(t_coder *coder, t_dongle *first, t_dongle *second)
 	return (1);
 }
 
-void	request_dongle(t_coder *coder, t_dongle *dongle)
+void	request_dongle(t_dev *coder, t_tool *dongle)
 {
-	t_all	*all;
+	t_app	*all;
 
 	all = coder->all;
 	pthread_mutex_lock(&all->req_mu);
 	coder->target_dongle = dongle;
 	coder->granted = 0;
 	if (coder->has_first_dongle == 0)
-	{
-		if (coder->compile_count == 0)
-			coder->request_seq = coder->coder_id;
-		else
-			coder->request_seq = ++all->request_seq;
-	}
+		coder->request_seq = ++all->request_seq;
 	heap_insert(all->heap, coder);
-	pthread_cond_signal(&all->req_cv);
+	pthread_cond_broadcast(&all->req_cv);
 	while (!coder->granted && !all->stop_flag)
 	{
 		pthread_cond_wait(&coder->cv, &all->req_mu);

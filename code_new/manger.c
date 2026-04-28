@@ -6,72 +6,86 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 14:06:00 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/24 14:48:06 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/04/28 18:02:09 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-static int	is_better_request(t_heap *heap, t_coder *first, t_coder *second)
+static int	is_better_request(t_heap *heap, t_coder *a, t_coder *b)
 {
-	if (first->has_first_dongle != second->has_first_dongle)
-		return (first->has_first_dongle > second->has_first_dongle);
 	if (!heap->is_edf)
-		return (first->request_seq < second->request_seq);
-	if (first->time_to_die == second->time_to_die)
 	{
-		if (first->compile_count == second->compile_count)
-			return (first->request_seq < second->request_seq);
-		return (first->compile_count < second->compile_count);
+		if (a->request_seq == b->request_seq)
+			return (a->coder_id < b->coder_id);
+		return (a->request_seq < b->request_seq);
 	}
-	return (first->time_to_die < second->time_to_die);
+	if (a->time_to_die == b->time_to_die)
+	{
+		if (a->request_seq == b->request_seq)
+			return (a->coder_id < b->coder_id);
+		return (a->request_seq < b->request_seq);
+	}
+	return (a->time_to_die < b->time_to_die);
 }
 
-static int	update_best_index(t_all *all, int index, int best_index)
+static int	update_best_index(t_all *all, int i, int best_i)
 {
-	long long	current_time;
-	t_dongle	*dongle;
-	t_coder		*best;
+	long long	now;
+	t_dongle	*d;
 
-	current_time = get_time_in_ms();
-	dongle = all->heap->items[index]->target_dongle;
-	if (!dongle || dongle->in_use != 0 || current_time < dongle->cooldown)
-		return (best_index);
-	if (best_index == -1)
-		return (index);
-	best = all->heap->items[best_index];
-	if (is_better_request(all->heap, all->heap->items[index], best))
-		return (index);
-	return (best_index);
+	now = get_time_in_ms();
+	d = all->heap->items[i]->target_dongle;
+	if (!d || d->in_use != 0 || now < d->cooldown)
+		return (best_i);
+	if (best_i == -1)
+		return (i);
+	if (is_better_request(all->heap, all->heap->items[i], all->heap->items[best_i]))
+		return (i);
+	return (best_i);
 }
 
 static int	find_best_request(t_all *all)
 {
-	int	index;
-	int	best_index;
+	int	i;
+	int	best_i;
 
-	best_index = -1;
-	index = 0;
-	while (index < all->heap->size)
+	best_i = -1;
+	i = 0;
+	while (i < all->heap->size)
 	{
-		best_index = update_best_index(all, index, best_index);
-		index++;
+		best_i = update_best_index(all, i, best_i);
+		i++;
 	}
-	return (best_index);
+	return (best_i);
 }
 
 static int	try_grant_requests(t_all *all)
 {
-	int	best_index;
+	int	best_i;
 
-	best_index = find_best_request(all);
-	if (best_index == -1)
+	best_i = find_best_request(all);
+	if (best_i == -1)
 		return (0);
-	all->heap->items[best_index]->target_dongle->in_use = 1;
-	all->heap->items[best_index]->granted = 1;
-	pthread_cond_signal(&all->heap->items[best_index]->cv);
-	heap_remove_at(all->heap, best_index);
+	all->heap->items[best_i]->target_dongle->in_use = 1;
+	all->heap->items[best_i]->granted = 1;
+	pthread_cond_broadcast(&all->heap->items[best_i]->cv);
+	heap_remove_at(all->heap, best_i);
 	return (1);
+}
+
+static void	broadcast_stop_locked(t_all *all)
+{
+	int	index;
+
+	all->stop_flag = 1;
+	pthread_cond_broadcast(&all->req_cv);
+	index = 0;
+	while (index < all->parms.num_coders)
+	{
+		pthread_cond_broadcast(&all->coder[index].cv);
+		index++;
+	}
 }
 
 void	*manager_routine(void *arg)
@@ -82,8 +96,14 @@ void	*manager_routine(void *arg)
 	pthread_mutex_lock(&all->req_mu);
 	while (!all->stop_flag)
 	{
-		while (heap_is_empty(all->heap) && !all->stop_flag)
+		while (heap_is_empty(all->heap) && !all->stop_requested
+			&& !all->stop_flag)
 			pthread_cond_wait(&all->req_cv, &all->req_mu);
+		if (all->stop_requested)
+		{
+			broadcast_stop_locked(all);
+			break ;
+		}
 		if (all->stop_flag)
 			break ;
 		if (try_grant_requests(all) == 0)
