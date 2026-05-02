@@ -13,9 +13,7 @@
 #ifndef CODEXION_H
 # define CODEXION_H
 
-# include <errno.h>
 # include <pthread.h>
-# include <stdbool.h>
 # include <stdint.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -25,30 +23,27 @@
 # include <limits.h>
 # define FIFO 0
 # define EDF 1
-# define ERR_USAGE \
-	"Usage: ./codexion num_coders time_to_burnout time_to_compile" \
-	" time_to_debug time_to_refactor num_compiles_req" \
-	" dongle_cooldown scheduler\n"
-# define ERR_SCHEDULER "Error: Invalid scheduler. Use 'fifo' or 'edf'.\n"
-# define ERR_NOT_NUMBER "Error: Arguments must be integers (no floats, letters or signs).\n"
-# define ERR_OVERFLOW "Error: Value overflows long long maximum.\n"
-# define ERR_TOO_LARGE "Error: Value exceeds maximum allowed (2147483647).\n"
-# define ERR_POSITIVE "Error: num_coders, time_to_burnout and time_to_compile must be > 0.\n"
-# define ERR_NON_NEG "Error: time_to_debug, refactor, num_compiles and cooldown must be >= 0.\n"
+# define ERR_USAGE "Usage: N burnout compile debug refact count cool sched\n"
+# define ERR_SCHEDULER	"Error: Invalid scheduler. Use 'fifo' or 'edf'.\n"
+# define ERR_NOT_NUMBER	"Error: only integers allowed (no floats or letters).\n"
+# define ERR_OVERFLOW	"Error: Value overflows long long maximum.\n"
+# define ERR_TOO_LARGE	"Error: Value exceeds maximum allowed (2147483647).\n"
+# define ERR_POSITIVE	"Error: args 1-3 (coders/burnout/compile) must be > 0.\n"
+# define ERR_NON_NEG	"Error: args 4-7 must be >= 0.\n"
 
-typedef struct s_dev			t_dev;
+typedef struct s_dev		t_dev;
 typedef struct s_scheduler	t_scheduler;
 
 typedef struct s_config
 {
-	long long	num_coders;
-	long long	time_to_burnout;
-	long long	time_to_compile;
-	long long	time_to_debug;
-	long long	time_to_refactor;
-	long long	compiles_required;
-	long long	dongle_cooldown;
-	int			is_edf;
+	long long		num_coders;
+	long long		time_to_burnout;
+	long long		time_to_compile;
+	long long		time_to_debug;
+	long long		time_to_refactor;
+	long long		compiles_required;
+	long long		dongle_cooldown;
+	int				is_edf;
 }	t_config;
 
 typedef struct s_tool
@@ -56,36 +51,31 @@ typedef struct s_tool
 	int				in_use;
 	long long		cooldown;
 	int				id;
-	pthread_mutex_t		mutex;
+	pthread_mutex_t	mutex;
 }	t_tool;
 
 typedef struct s_scheduler
 {
-	t_dev	**items;
-	int		max_size;
-	int		size;
-	int		is_edf;
+	t_dev		**items;
+	int			max_size;
+	int			size;
+	int			is_edf;
 }	t_scheduler;
 
 typedef struct s_manger
 {
 	pthread_t	thread;
-	long long	request_seq;
-	t_dev		**coders;
-	int			num_coders;
-	t_scheduler		*heap;
 }	t_manger;
 
 typedef struct s_app
 {
 	t_config		parms;
 	t_tool			*dongles;
-	t_dev				*coder;
+	t_dev			*coder;
 	t_scheduler		*heap;
 	pthread_t		monitor_thread;
 	t_manger		manger;
 	long long		start_time_ms;
-	int				stop_flag;
 	int				finished_coders;
 	long long		request_seq;
 	int				stop_requested;
@@ -105,15 +95,13 @@ typedef struct s_dev
 	long long		time_to_die;
 	t_tool			*left_dongle;
 	t_tool			*right_dongle;
-	t_tool			*target_dongle;
 	int				granted;
-	int				has_first_dongle;
 	long long		request_seq;
 	pthread_cond_t	cv;
 	pthread_t		thread;
 	pthread_mutex_t	cv_mu;
 	int				compile_count;
-	t_app				*all;
+	t_app			*all;
 }	t_dev;
 
 typedef t_config	t_params;
@@ -134,7 +122,6 @@ void		log_print(t_dev *coder, const char *action);
 void		print_state(t_dev *coder, const char *state);
 long long	ft_atol(const char *str);
 long long	get_time_in_ms(void);
-void		ft_usleep(long long time_to_sleep);
 int			init_all(t_app *all);
 int			start_and_join_coders(t_app *all);
 void		*coder_routine(void *arg);
@@ -146,12 +133,8 @@ void		*manager_routine(void *arg);
 
 void		cleanup_all(t_app *all);
 void		cleanup_dongles(t_app *all, int num_coders);
-void		take_dongles(t_dev *coder);
 void		put_dongle(t_dev *coder);
 void		smart_sleep(long long time_to_sleep, t_app *all);
-int			request_second_dongle(t_dev *coder, t_tool *first,
-				t_tool *second);
-int	should_stop(t_app *all);
 t_scheduler	*heap_init(int max_size, int is_edf);
 void		heap_destroy(t_scheduler *heap);
 int			heap_is_empty(t_scheduler *heap);
@@ -162,10 +145,7 @@ void		bubble_up(t_scheduler *heap, int index);
 void		bubble_down(t_scheduler *heap, int index, int size);
 void		heap_remove_at(t_scheduler *heap, int index);
 
-void		from_ms_to_timespec(struct timespec *time_spec, long long time_ms);
-uint64_t	from_timeval_to_ms(struct timeval time_value);
-uint64_t	get_current_time_ms(void);
-int	valdite_number(const char *s);
-int	check_avalible(t_tool *first, t_tool *second);
+int			valdite_number(const char *s);
+int			check_avalible(t_tool *first, t_tool *second);
 
 #endif

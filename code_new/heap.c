@@ -46,7 +46,6 @@ void	bubble_up(t_scheduler *heap, int idx)
 	}
 }
 
-
 void	bubble_down(t_scheduler *heap, int idx, int size)
 {
 	int	l;
@@ -60,10 +59,10 @@ void	bubble_down(t_scheduler *heap, int idx, int size)
 		r = 2 * idx + 2;
 		best = idx;
 		if (l < size && is_higher_priority(heap,
-					heap->items[l], heap->items[best]))
+				heap->items[l], heap->items[best]))
 			best = l;
 		if (r < size && is_higher_priority(heap,
-					heap->items[r], heap->items[best]))
+				heap->items[r], heap->items[best]))
 			best = r;
 		if (best == idx)
 			break ;
@@ -85,7 +84,6 @@ void	heap_remove_at(t_scheduler *heap, int index)
 	bubble_up(heap, index);
 	bubble_down(heap, index, heap->size);
 }
-
 
 t_scheduler	*heap_init(int max_size, int is_edf)
 {

@@ -73,9 +73,7 @@ static int	init_coders(t_app *all)
 		all->coder[index].compile_count = 0;
 		all->coder[index].right_dongle = &all->dongles[index];
 		all->coder[index].left_dongle = &all->dongles[next_index];
-		all->coder[index].target_dongle = NULL;
 		all->coder[index].granted = 0;
-		all->coder[index].has_first_dongle = 0;
 		all->coder[index].request_seq = 0;
 		all->coder[index].all = all;
 		if (pthread_mutex_init(&all->coder[index].cv_mu, NULL) != 0)
