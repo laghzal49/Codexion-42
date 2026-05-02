@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include "codexion.h"
 
-void	parsing(t_params *parse, char **av)
+int	parsing(t_params *parse, char **av)
 {
 	parse->num_coders = ft_atol(av[1]);
 	parse->time_to_burnout = ft_atol(av[2]);
@@ -30,15 +30,20 @@ void	parsing(t_params *parse, char **av)
 		|| parse->dongle_cooldown < 0)
 	{
 		error_exit("Error: Invalid numeric arguments. Must be positive.\n");
+		return (1);
 	}
 	if (strcmp(av[8], "fifo") == 0)
 		parse->is_edf = 0;
 	else if (strcmp(av[8], "edf") == 0)
 		parse->is_edf = 1;
 	else
+	{
 		error_exit("Error: Invalid scheduler. Must be 'fifo' or 'edf'.\n");
+		return (1);
+	}
 	printf("Parsed: %lld coders, scheduler enum: %d (0=FIFO, 1=EDF)\n",
 		parse->num_coders, parse->is_edf);
+	return (0);
 }
 
 int	main(int ac, char **av)
@@ -49,10 +54,17 @@ int	main(int ac, char **av)
 	msg_error = "Usage: ./main num_coders time_to_burnout time_to_compile "
 		"time_to_debug time_to_refactor num_compiles_req dongle_cooldown\n";
 	if (ac != 9)
+	{
 		error_exit(msg_error);
-	parsing(&sim.params, av);
+		return (1);
+	}
+	if (parsing(&sim.params, av))
+		return (1);
 	if (init_sim(&sim))
+	{
 		error_exit("Error: init sim Failed.\n");
+		return (1);
+	}
 	if (start_sim(&sim) != 0)
 		return (1);
 	monitor_routine(&sim);

@@ -12,17 +12,17 @@
 
 #include "codexion.h"
 
-int	should_stop(t_all *all)
+int	should_stop(t_app *all)
 {
 	int	stop_flag;
 
 	pthread_mutex_lock(&all->req_mu);
-	stop_flag = all->stop_flag;
+	stop_flag = all->stop_requested;
 	pthread_mutex_unlock(&all->req_mu);
 	return (stop_flag);
 }
 
-void	set_stop(t_all *all)
+void	set_stop(t_app *all)
 {
 	pthread_mutex_lock(&all->req_mu);
 	all->stop_requested = 1;
@@ -30,7 +30,7 @@ void	set_stop(t_all *all)
 	pthread_mutex_unlock(&all->req_mu);
 }
 
-void	mark_coder_finished(t_all *all)
+void	mark_coder_finished(t_app *all)
 {
 	int	is_complete;
 
@@ -48,7 +48,7 @@ void	mark_coder_finished(t_all *all)
 		return ;
 }
 
-static int	has_burned_out(t_all *all, int index, long long current_time)
+static int	has_burned_out(t_app *all, int index, long long current_time)
 {
 	long long	time_to_die;
 	int			compile_count;
@@ -75,7 +75,7 @@ void	*monitor_routine(void *arg)
 	long long	current_time;
 	int			index;
 
-	all = (t_all *)arg;
+	all = (t_app *)arg;
 	while (!should_stop(all))
 	{
 		current_time = get_time_in_ms();

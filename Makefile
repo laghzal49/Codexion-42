@@ -2,7 +2,7 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread
 NAME = codexion
 SRC_DIR = code_new
-SRCS = clean_all.c coder.c codexion.c dongle.c heap.c heap2.c init.c manger.c parsing.c simlition.c starter.c state.c time.c utils.c
+SRCS = clean_all.c coder.c codexion.c dongle.c heap.c heap2.c init.c manger.c monitor.c parsing.c starter.c state.c time.c utils.c
 OBJS = $(addprefix $(SRC_DIR)/,$(SRCS:.c=.o))
 HEADERS = $(SRC_DIR)/codexion.h
 

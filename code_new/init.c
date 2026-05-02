@@ -23,6 +23,9 @@ static int	init_sync(t_app *all)
 	if (pthread_cond_init(&all->req_cv, NULL) != 0)
 		return (1);
 	all->req_cv_ready = 1;
+	if (pthread_mutex_init(&all->heap_mutex, NULL) != 0)
+		return (1);
+	all->heap_mutex_ready = 1;
 	return (0);
 }
 
@@ -51,6 +54,7 @@ static int	init_dongles(t_app *all)
 		all->dongles[index].in_use = 0;
 		all->dongles[index].cooldown = 0;
 		all->dongles[index].id = index;
+		pthread_mutex_init(&all->dongles[index].mutex, NULL);
 		index++;
 	}
 	return (0);

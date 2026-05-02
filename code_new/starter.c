@@ -13,7 +13,7 @@
 #include "codexion.h"
 #include <pthread.h>
 
-static void	set_start_state(t_all *all)
+static void	set_start_state(t_app *all)
 {
 	int			i;
 	long long	t0;
@@ -32,7 +32,7 @@ static void	set_start_state(t_all *all)
 	}
 }
 
-static int	create_coder_threads(t_all *all)
+static int	create_coder_threads(t_app *all)
 {
 	int	i;
 
@@ -52,7 +52,7 @@ static int	create_coder_threads(t_all *all)
 	return (0);
 }
 
-static int	join_coder_threads(t_all *all)
+static int	join_coder_threads(t_app *all)
 {
 	int	i;
 
@@ -71,14 +71,14 @@ static int	join_coder_threads(t_all *all)
 	return (0);
 }
 
-int	start_and_join_coders(t_all *all)
+int	start_and_join_coders(t_app *all)
 {
-	if (pthread_create(&all->manager_thread, NULL, manager_routine, all) != 0)
+	if (pthread_create(&all->manger.thread, NULL, manager_routine, all) != 0)
 		return (1);
 	if (create_coder_threads(all) != 0)
 	{
 		set_stop(all);
-		pthread_join(all->manager_thread, NULL);
+		pthread_join(all->manger.thread, NULL);
 		return (1);
 	}
 	set_start_state(all);
@@ -86,17 +86,17 @@ int	start_and_join_coders(t_all *all)
 	{
 		set_stop(all);
 		join_coder_threads(all);
-		pthread_join(all->manager_thread, NULL);
+		pthread_join(all->manger.thread, NULL);
 		return (1);
 	}
 	if (join_coder_threads(all) != 0)
 	{
-		pthread_join(all->manager_thread, NULL);
+		pthread_join(all->manger.thread, NULL);
 		pthread_join(all->monitor_thread, NULL);
 		return (1);
 	}
 	set_stop(all);
-	if (pthread_join(all->manager_thread, NULL) != 0)
+	if (pthread_join(all->manger.thread, NULL) != 0)
 		return (1);
 	if (pthread_join(all->monitor_thread, NULL) != 0)
 		return (1);

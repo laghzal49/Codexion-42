@@ -21,6 +21,7 @@ void	cleanup_dongles(t_all *all, int num_coders)
 	index = 0;
 	while (index < num_coders)
 	{
+		pthread_mutex_destroy(&all->dongles[index].mutex);
 		index++;
 	}
 }
@@ -51,6 +52,8 @@ void	cleanup_all(t_all *all)
 		pthread_cond_destroy(&all->req_cv);
 	if (all->req_mu_ready)
 		pthread_mutex_destroy(&all->req_mu);
+	if (all->heap_mutex_ready)
+		pthread_mutex_destroy(&all->heap_mutex);
 	if (all->heap)
 		heap_destroy(all->heap);
 	free(all->dongles);

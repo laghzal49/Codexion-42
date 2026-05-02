@@ -25,7 +25,6 @@ int	ft_strlen(const char *s)
 void	error_exit(const char *msg)
 {
 	write(2, msg, ft_strlen(msg));
-	exit(1);
 }
 
 long long	ft_atol(const char *str)

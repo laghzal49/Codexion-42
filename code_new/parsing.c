@@ -14,17 +14,23 @@
 
 static void	validate_numeric_args(char **argv)
 {
-	int	index;
+	int			index;
+	long long	val;
 
 	index = 1;
 	while (index <= 7)
 	{
 		if (valdite_number(argv[index]))
-			error_exit(NOFLOAT);
-		if (index <= 5 && ft_atol(argv[index]) <= 0)
-			error_exit("Error: Invalid numeric arguments. Must be positive.\n");
-		if (index >= 6 && ft_atol(argv[index]) < 0)
-			error_exit("Error: Invalid numeric arguments. Must be positive.\n");
+			error_exit(ERR_NOT_NUMBER);
+		val = ft_atol(argv[index]);
+		if (val == LLONG_MAX)
+			error_exit(ERR_OVERFLOW);
+		if (val > (long long)INT_MAX)
+			error_exit(ERR_TOO_LARGE);
+		if (index <= 3 && val <= 0)
+			error_exit(ERR_POSITIVE);
+		if (index >= 4 && val < 0)
+			error_exit(ERR_NON_NEG);
 		index++;
 	}
 }
@@ -47,7 +53,7 @@ static void	parse_scheduler(t_config *params, char **argv)
 	else if (strcmp(argv[8], "edf") == 0)
 		params->is_edf = EDF;
 	else
-		error_exit(ERROREDF);
+		error_exit(ERR_SCHEDULER);
 }
 
 void	parsing(t_config *params, char **argv)
@@ -59,8 +65,7 @@ void	parsing(t_config *params, char **argv)
 
 int	check_parsing(int argc)
 {
-
 	if (argc != 9)
-		error_exit(CHECK);
+		error_exit(ERR_USAGE);
 	return (0);
 }
