@@ -11,8 +11,6 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
-#include <bits/pthreadtypes.h>
-#include <pthread.h>
 
 void	log_print(t_dev *coder, const char *action)
 {
@@ -34,19 +32,12 @@ static void	run_cycle(t_dev *coder)
 		coder_other(coder);
 }
 
-void	check(t_dev *coder)
+static void	wait_for_start(t_dev *coder)
 {
-	long long	current_time;
-
-	while (!should_stop(coder->all))
-	{
-		pthread_mutex_lock(&coder->cv_mu);
-		current_time = coder->all->start_time_ms;
-		pthread_mutex_unlock(&coder->cv_mu);
-		if (current_time != 0)
-			break ;
-		smart_sleep(10, coder->all);
-	}
+	pthread_mutex_lock(&coder->all->req_mu);
+	while (!coder->all->stop_requested && coder->all->start_time_ms == 0)
+		pthread_cond_wait(&coder->all->req_cv, &coder->all->req_mu);
+	pthread_mutex_unlock(&coder->all->req_mu);
 }
 
 void	*coder_routine(void *arg)
@@ -55,7 +46,7 @@ void	*coder_routine(void *arg)
 	int			is_done;
 
 	coder = (t_dev *)arg;
-	check(coder);
+	wait_for_start(coder);
 	while (!should_stop(coder->all))
 	{
 		pthread_mutex_lock(&coder->cv_mu);

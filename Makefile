@@ -1,25 +1,26 @@
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread
 NAME = codexion
-SRC_DIR = code_new
-SRCS = clean_all.c coder.c codexion.c dongle.c heap.c heap2.c init.c manger.c monitor.c parsing.c starter.c state.c time.c utils.c
-OBJS = $(addprefix $(SRC_DIR)/,$(SRCS:.c=.o))
-HEADERS = $(SRC_DIR)/codexion.h
+SRCS = code_new/clean_all.c code_new/coder.c code_new/monitor.c code_new/codexion.c code_new/dongle.c code_new/dongle_helper.c code_new/heap.c code_new/heap2.c code_new/heap_utils.c code_new/init.c code_new/parsing.c code_new/starter.c code_new/state.c code_new/time.c code_new/utils.c
+OBJS = $(SRCS:.c=.o)
+HEADERS = codexion.h
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
+	$(CC) $(CFLAGS) -no-pie -o $(NAME) $(OBJS)
 
-$(SRC_DIR)/%.o: $(SRC_DIR)/%.c $(HEADERS)
+%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(OBJS)
 
 fclean: clean
-	rm -f $(NAME) $(SRC_DIR)/codexion $(SRC_DIR)/a.out
+	rm -f $(NAME) a.out
+
+clean_all: fclean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean clean_all re

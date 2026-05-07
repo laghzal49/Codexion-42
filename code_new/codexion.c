@@ -12,7 +12,29 @@
 
 #include "codexion.h"
 
-int	main(int argc, char **argv)
+static int	check_parsing(int argc)
+{
+	if (argc != 9)
+	{
+		error_exit(ERR_USAGE_1);
+		error_exit(ERR_USAGE_2);
+		return (error_exit(ERR_USAGE_3));
+	}
+	return (0);
+}
+
+static int	prepare_app(t_app *all, int argc, char **argv)
+{
+	if (check_parsing(argc) != 0)
+		return (1);
+	if (parsing(&all->parms, argv) != 0)
+		return (1);
+	if (init_all(all) != 0)
+		return (1);
+	return (0);
+}
+
+static int	run_app(int argc, char **argv)
 {
 	t_app	*all;
 
@@ -20,18 +42,21 @@ int	main(int argc, char **argv)
 	if (!all)
 		return (1);
 	memset(all, 0, sizeof(t_app));
-	check_parsing(argc);
-	parsing(&all->parms, argv);
-	if (init_all(all))
+	if (prepare_app(all, argc, argv) != 0)
 	{
 		cleanup_all(all);
 		return (1);
 	}
-	if (start_and_join_coders(all))
+	if (start_and_join_coders(all) != 0)
 	{
 		cleanup_all(all);
 		return (1);
 	}
 	cleanup_all(all);
 	return (0);
+}
+
+int	main(int argc, char **argv)
+{
+	return (run_app(argc, argv));
 }

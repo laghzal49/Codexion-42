@@ -23,9 +23,6 @@ static int	init_sync(t_app *all)
 	if (pthread_cond_init(&all->req_cv, NULL) != 0)
 		return (1);
 	all->req_cv_ready = 1;
-	if (pthread_mutex_init(&all->heap_mutex, NULL) != 0)
-		return (1);
-	all->heap_mutex_ready = 1;
 	return (0);
 }
 
@@ -53,10 +50,13 @@ static int	init_dongles(t_app *all)
 	{
 		all->dongles[index].in_use = 0;
 		all->dongles[index].cooldown = 0;
-		all->dongles[index].id = index;
+		all->dongles[index].heap_mutex_ready = 0;
 		pthread_mutex_init(&all->dongles[index].mutex, NULL);
 		all->dongles[index].heap = heap_init(2, all->parms.is_edf);
-		pthread_mutex_init(&all->dongles[index].heap_mutex, NULL);
+		if (!all->dongles[index].heap)
+			return (1);
+		if (pthread_mutex_init(&all->dongles[index].heap_mutex, NULL) != 0)
+			return (1);
 		all->dongles[index].heap_mutex_ready = 1;
 		index++;
 	}
@@ -76,13 +76,10 @@ static int	init_coders(t_app *all)
 		all->coder[index].compile_count = 0;
 		all->coder[index].right_dongle = &all->dongles[index];
 		all->coder[index].left_dongle = &all->dongles[next_index];
-		all->coder[index].granted = 0;
 		all->coder[index].request_seq = 0;
 		all->coder[index].all = all;
 		if (pthread_mutex_init(&all->coder[index].cv_mu, NULL) != 0)
 			return (1);
-		if (pthread_cond_init(&all->coder[index].cv, NULL) != 0)
-			return (pthread_mutex_destroy(&all->coder[index].cv_mu), 1);
 		index++;
 	}
 	return (0);
@@ -92,15 +89,12 @@ int	init_all(t_app *all)
 {
 	if (init_sync(all) != 0)
 		return (1);
-	all->heap = heap_init((int)all->parms.num_coders, all->parms.is_edf);
-	if (!all->heap || init_alloc(all) != 0 || init_dongles(all) != 0
+	if (init_alloc(all) != 0 || init_dongles(all) != 0
 		|| init_coders(all) != 0)
 	{
 		cleanup_dongles(all, all->parms.num_coders);
 		free(all->coder);
 		all->coder = NULL;
-		heap_destroy(all->heap);
-		all->heap = NULL;
 		return (1);
 	}
 	all->request_seq = 0;

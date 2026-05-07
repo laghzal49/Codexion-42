@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
-#include <pthread.h>
 
 void	coder_compile(t_coder *coder)
 {

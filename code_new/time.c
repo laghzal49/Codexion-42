@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/13 17:42:22 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/24 17:17:26 by otahiri-         ###   ########.fr       */
+/*   Updated: 2026/04/24 17:17:26 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,28 +34,4 @@ void	smart_sleep(long long time_to_sleep, t_all *all)
 			break ;
 		usleep(100);
 	}
-}
-
-void	from_ms_to_timespec(struct timespec *time_spec, long long time_ms)
-{
-	time_spec->tv_sec = time_ms / 1000;
-	time_spec->tv_nsec = (time_ms % 1000) * 1000000L;
-}
-
-uint64_t	from_timeval_to_ms(struct timeval time_value)
-{
-	uint64_t	time_ms;
-
-	time_ms = time_value.tv_sec * 1000 + time_value.tv_usec / 1000;
-	return (time_ms);
-}
-
-uint64_t	get_current_time_ms(void)
-{
-	uint64_t		time_ms;
-	struct timeval	time_value;
-
-	gettimeofday(&time_value, NULL);
-	time_ms = from_timeval_to_ms(time_value);
-	return (time_ms);
 }

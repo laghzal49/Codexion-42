@@ -21,17 +21,3 @@ int	heap_insert(t_scheduler *heap, t_dev *coder)
 	heap->size++;
 	return (1);
 }
-
-int	heap_pop(t_scheduler *heap, t_dev **out)
-{
-	if (!heap || !out || heap_is_empty(heap))
-		return (0);
-	*out = heap->items[0];
-	heap->size--;
-	if (heap->size > 0)
-	{
-		heap->items[0] = heap->items[heap->size];
-		bubble_down(heap, 0, heap->size);
-	}
-	return (1);
-}

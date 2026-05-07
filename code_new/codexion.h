@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/12 19:16:10 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/28 18:07:45 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/05/07 12:00:00 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 # define CODEXION_H
 
 # include <pthread.h>
-# include <stdint.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
@@ -24,13 +23,15 @@
 
 # define FIFO 0
 # define EDF 1
-# define ERR_USAGE "Usage: N burnout compile debug refact count cool sched\n"
-# define ERR_SCHEDULER  "Error: Invalid scheduler. Use 'fifo' or 'edf'.\n"
+# define ERR_USAGE_1 "Usage: ./codexion number_of_coders time_to_burnout"
+# define ERR_USAGE_2 " time_to_compile time_to_debug time_to_refactor"
+# define ERR_USAGE_3 " number_of_compiles_required dongle_cooldown scheduler\n"
+# define ERR_SCHEDULER "Error: Invalid scheduler. Use 'fifo' or 'edf'.\n"
 # define ERR_NOT_NUMBER "Error: only integers allowed (no floats or letters).\n"
-# define ERR_OVERFLOW   "Error: Value overflows long long maximum.\n"
-# define ERR_TOO_LARGE  "Error: Value exceeds maximum allowed (2147483647).\n"
-# define ERR_POSITIVE   "Error: args 1-3 (coders/burnout/compile) must be > 0.\n"
-# define ERR_NON_NEG    "Error: args 4-7 must be >= 0.\n"
+# define ERR_OVERFLOW "Error: Value overflows long long maximum.\n"
+# define ERR_TOO_LARGE "Error: Value exceeds maximum allowed (2147483647).\n"
+# define ERR_POSITIVE "Error: args 1-3 (coders/burnout/compile) must be > 0.\n"
+# define ERR_NON_NEG "Error: args 4-7 must be >= 0.\n"
 
 typedef struct s_dev		t_dev;
 typedef struct s_scheduler	t_scheduler;
@@ -45,18 +46,17 @@ typedef struct s_config
 	long long		compiles_required;
 	long long		dongle_cooldown;
 	int				is_edf;
-}	t_config;
+}t_config;
 
 typedef struct s_tool
 {
 	int				in_use;
 	long long		cooldown;
-	int				id;
 	pthread_mutex_t	mutex;
 	t_scheduler		*heap;
 	pthread_mutex_t	heap_mutex;
 	int				heap_mutex_ready;
-}	t_tool;
+}t_tool;
 
 typedef struct s_scheduler
 {
@@ -64,21 +64,14 @@ typedef struct s_scheduler
 	int				max_size;
 	int				size;
 	int				is_edf;
-}	t_scheduler;
-
-typedef struct s_manger
-{
-	pthread_t		thread;
-}	t_manger;
+}t_scheduler;
 
 typedef struct s_app
 {
 	t_config		parms;
 	t_tool			*dongles;
 	t_dev			*coder;
-	t_scheduler		*heap;
 	pthread_t		monitor_thread;
-	t_manger		manger;
 	long long		start_time_ms;
 	int				finished_coders;
 	long long		request_seq;
@@ -86,12 +79,10 @@ typedef struct s_app
 	pthread_mutex_t	req_mu;
 	pthread_cond_t	req_cv;
 	pthread_mutex_t	log_mutex;
-	pthread_mutex_t	heap_mutex;
 	int				req_mu_ready;
 	int				req_cv_ready;
 	int				log_mutex_ready;
-	int				heap_mutex_ready;
-}	t_app;
+}t_app;
 
 typedef struct s_dev
 {
@@ -99,84 +90,56 @@ typedef struct s_dev
 	long long		time_to_die;
 	t_tool			*left_dongle;
 	t_tool			*right_dongle;
-	int				granted;
 	long long		request_seq;
-	pthread_cond_t	cv;
 	pthread_t		thread;
 	pthread_mutex_t	cv_mu;
 	int				compile_count;
 	t_app			*all;
-}	t_dev;
+}t_dev;
 
-typedef t_config			t_params;
-typedef t_tool				t_dongle;
-typedef t_scheduler			t_heap;
 typedef t_app				t_all;
 typedef t_dev				t_coder;
 
-/* coder.c */
-void			coder_compile(t_dev *coder);
-void			log_print(t_dev *coder, const char *action);
+int				parsing(t_config *params, char **argv);
+int				init_all(t_app *all);
+int				start_and_join_coders(t_app *all);
+void			*monitor_routine(void *arg);
 void			*coder_routine(void *arg);
 
-/* init.c */
-int				init_all(t_app *all);
-void			cleanup_dongles(t_app *all, int num_coders);
-
-/* parsing.c */
-int				check_parsing(int argc);
-void			parsing(t_config *params, char **argv);
-
-/* state.c */
+void			coder_compile(t_dev *coder);
 void			coder_other(t_dev *coder);
-
-/* time.c */
-long long		get_time_in_ms(void);
-void			smart_sleep(long long time_to_sleep, t_app *all);
-
-/* utils.c */
-int				ft_strlen(const char *string);
-void			error_exit(const char *message);
-void			print_state(t_dev *coder, const char *state);
-long long		ft_atol(const char *str);
-int				should_stop(t_app *all);
-void			set_stop(t_app *all);
-void			mark_coder_finished(t_app *all);
-void			cleanup_all(t_app *all);
-int				valdite_number(const char *s);
-
-/* dongle.c */
 int				request_dongles(t_dev *coder);
 void			put_dongle(t_dev *coder);
 
-/* dongle_helper.c */
 int				is_top_of_heap(t_tool *dongle, t_dev *coder);
 void			lock_order(t_dev *coder, t_tool **first, t_tool **second);
 long long		next_seq(t_dev *coder);
 void			cleanup_heaps_locked(t_dev *coder);
-void			cleanup_heaps(t_dev *coder);
 
-/* starter.c */
-int				start_and_join_coders(t_app *all);
+int				should_stop(t_app *all);
+void			set_stop(t_app *all);
+void			mark_coder_finished(t_app *all);
 
-/* monitor.c */
-void			*monitor_routine(void *arg);
+void			cleanup_all(t_app *all);
+void			cleanup_dongles(t_app *all, int num_coders);
 
-/* manager.c (if exists) */
-void			*manager_routine(void *arg);
+long long		get_time_in_ms(void);
+void			smart_sleep(long long time_to_sleep, t_app *all);
 
-/* heap.c */
+int				error_exit(const char *message);
+int				ft_strlen(const char *string);
+long long		ft_atol(const char *str);
+int				valdite_number(const char *s);
+void			log_print(t_dev *coder, const char *action);
+
 t_scheduler		*heap_init(int max_size, int is_edf);
-void			bubble_up(t_scheduler *heap, int index);
-void			bubble_down(t_scheduler *heap, int index, int size);
-void			heap_remove_at(t_scheduler *heap, int index);
-
-/* heap_utils.c */
 void			heap_destroy(t_scheduler *heap);
 int				heap_is_empty(t_scheduler *heap);
 int				heap_is_full(t_scheduler *heap);
 int				heap_insert(t_scheduler *heap, t_dev *coder);
-int				heap_pop(t_scheduler *heap, t_dev **out);
+void			bubble_up(t_scheduler *heap, int index);
+void			bubble_down(t_scheduler *heap, int index, int size);
+void			heap_remove_at(t_scheduler *heap, int index);
 int				heap_find_index(t_scheduler *heap, t_dev *coder);
 
 #endif

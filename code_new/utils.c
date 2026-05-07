@@ -22,20 +22,10 @@ int	ft_strlen(const char *s)
 	return (len);
 }
 
-void	error_exit(const char *msg)
+int	error_exit(const char *msg)
 {
 	write(2, msg, (size_t)ft_strlen(msg));
-	exit(1);
-}
-
-void	print_state(t_coder *coder, const char *state)
-{
-	long long	now;
-
-	pthread_mutex_lock(&coder->all->log_mutex);
-	now = get_time_in_ms() - coder->all->start_time_ms;
-	printf("%lld %lld %s\n", now, coder->coder_id, state);
-	pthread_mutex_unlock(&coder->all->log_mutex);
+	return (1);
 }
 
 int	valdite_number(const char *s)

@@ -20,6 +20,7 @@ static void	set_start_state(t_app *all)
 	t0 = get_time_in_ms();
 	pthread_mutex_lock(&all->req_mu);
 	all->start_time_ms = t0;
+	pthread_cond_broadcast(&all->req_cv);
 	pthread_mutex_unlock(&all->req_mu);
 	i = 0;
 	while (i < all->parms.num_coders)

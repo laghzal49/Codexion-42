@@ -37,7 +37,6 @@ static void	destroy_coder_sync(t_all *all)
 	index = 0;
 	while (index < all->parms.num_coders)
 	{
-		pthread_cond_destroy(&all->coder[index].cv);
 		pthread_mutex_destroy(&all->coder[index].cv_mu);
 		index++;
 	}
@@ -56,8 +55,6 @@ void	cleanup_all(t_all *all)
 		pthread_cond_destroy(&all->req_cv);
 	if (all->req_mu_ready)
 		pthread_mutex_destroy(&all->req_mu);
-	if (all->heap)
-		heap_destroy(all->heap);
 	free(all->dongles);
 	all->dongles = NULL;
 	free(all->coder);
