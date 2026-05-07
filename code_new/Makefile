@@ -1,7 +1,7 @@
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread -fno-pie
 NAME = codexion
-SRCS = clean_all.c coder.c monitor.c codexion.c dongle.c heap.c heap2.c init.c parsing.c manger.c starter.c state.c time.c utils.c
+SRCS = clean_all.c coder.c monitor.c codexion.c dongle.c heap.c heap2.c heap_utils.c init.c parsing.c starter.c state.c time.c utils.c dongle_utils.c
 OBJS = $(SRCS:.c=.o)
 HEADERS = codexion.h
 

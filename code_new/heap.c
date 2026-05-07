@@ -48,9 +48,9 @@ void	bubble_up(t_scheduler *heap, int idx)
 
 void	bubble_down(t_scheduler *heap, int idx, int size)
 {
-	int	l;
-	int	r;
-	int	best;
+	int		l;
+	int		r;
+	int		best;
 	t_dev	*tmp;
 
 	while (1)

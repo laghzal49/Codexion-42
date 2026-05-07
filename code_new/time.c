@@ -32,7 +32,6 @@ void	smart_sleep(long long time_to_sleep, t_all *all)
 	{
 		if (should_stop(all))
 			break ;
-
 		usleep(100);
 	}
 }

@@ -55,6 +55,9 @@ static int	init_dongles(t_app *all)
 		all->dongles[index].cooldown = 0;
 		all->dongles[index].id = index;
 		pthread_mutex_init(&all->dongles[index].mutex, NULL);
+		all->dongles[index].heap = heap_init(2, all->parms.is_edf);
+		pthread_mutex_init(&all->dongles[index].heap_mutex, NULL);
+		all->dongles[index].heap_mutex_ready = 1;
 		index++;
 	}
 	return (0);

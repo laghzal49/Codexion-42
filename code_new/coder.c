@@ -20,7 +20,8 @@ void	log_print(t_dev *coder, const char *action)
 
 	timestamp = get_time_in_ms() - coder->all->start_time_ms;
 	pthread_mutex_lock(&coder->all->log_mutex);
-	printf("%lld %lld %s\n", timestamp, coder->coder_id, action);
+	if (!should_stop(coder->all))
+		printf("%lld %lld %s\n", timestamp, coder->coder_id, action);
 	pthread_mutex_unlock(&coder->all->log_mutex);
 }
 
@@ -44,7 +45,7 @@ void	check(t_dev *coder)
 		pthread_mutex_unlock(&coder->cv_mu);
 		if (current_time != 0)
 			break ;
-		smart_sleep(1, coder->all);
+		smart_sleep(10, coder->all);
 	}
 }
 

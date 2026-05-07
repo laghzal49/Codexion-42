@@ -6,25 +6,11 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 14:06:00 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/28 18:17:59 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/05/07 10:05:00 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
-
-int	heap_is_empty(t_scheduler *heap)
-{
-	if (!heap)
-		return (1);
-	return (heap->size == 0);
-}
-
-int	heap_is_full(t_scheduler *heap)
-{
-	if (!heap)
-		return (1);
-	return (heap->size >= heap->max_size);
-}
 
 int	heap_insert(t_scheduler *heap, t_dev *coder)
 {
@@ -48,12 +34,4 @@ int	heap_pop(t_scheduler *heap, t_dev **out)
 		bubble_down(heap, 0, heap->size);
 	}
 	return (1);
-}
-
-void	heap_destroy(t_scheduler *heap)
-{
-	if (!heap)
-		return ;
-	free(heap->items);
-	free(heap);
 }

@@ -70,44 +70,27 @@ static int	join_coder_threads(t_app *all)
 	return (0);
 }
 
-static void	abort_after_coders(t_app *all)
-{
-	set_stop(all);
-	join_coder_threads(all);
-	pthread_join(all->manger.thread, NULL);
-}
-
-static int	join_all_threads(t_app *all)
-{
-	set_stop(all);
-	if (pthread_join(all->manger.thread, NULL) != 0)
-		return (1);
-	if (pthread_join(all->monitor_thread, NULL) != 0)
-		return (1);
-	return (0);
-}
-
 int	start_and_join_coders(t_app *all)
 {
-	if (pthread_create(&all->manger.thread, NULL, manager_routine, all) != 0)
-		return (1);
 	if (create_coder_threads(all) != 0)
 	{
 		set_stop(all);
-		pthread_join(all->manger.thread, NULL);
 		return (1);
 	}
 	set_start_state(all);
 	if (pthread_create(&all->monitor_thread, NULL, monitor_routine, all) != 0)
 	{
-		abort_after_coders(all);
+		set_stop(all);
+		join_coder_threads(all);
 		return (1);
 	}
 	if (join_coder_threads(all) != 0)
 	{
-		pthread_join(all->manger.thread, NULL);
 		pthread_join(all->monitor_thread, NULL);
 		return (1);
 	}
-	return (join_all_threads(all));
+	set_stop(all);
+	if (pthread_join(all->monitor_thread, NULL) != 0)
+		return (1);
+	return (0);
 }
