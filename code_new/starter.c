@@ -15,18 +15,17 @@
 static void	set_start_state(t_app *all)
 {
 	int			i;
-	long long	t0;
 
-	t0 = get_time_in_ms();
 	pthread_mutex_lock(&all->req_mu);
-	all->start_time_ms = t0;
+	all->start_time_ms = get_time_in_ms();
 	pthread_cond_broadcast(&all->req_cv);
 	pthread_mutex_unlock(&all->req_mu);
 	i = 0;
 	while (i < all->parms.num_coders)
 	{
 		pthread_mutex_lock(&all->coder[i].cv_mu);
-		all->coder[i].time_to_die = t0 + all->parms.time_to_burnout;
+		all->coder[i].time_to_die = all->start_time_ms + \
+			all->parms.time_to_burnout;
 		pthread_mutex_unlock(&all->coder[i].cv_mu);
 		i++;
 	}

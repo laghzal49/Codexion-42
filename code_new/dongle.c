@@ -59,9 +59,6 @@ static int	try_take_once(t_dev *coder, t_tool *first, t_tool *second)
 	second->in_use = 1;
 	cleanup_heaps_locked(coder);
 	unlock_all(first, second);
-	pthread_mutex_lock(&coder->cv_mu);
-	coder->time_to_die = get_time_in_ms() + coder->all->parms.time_to_burnout;
-	pthread_mutex_unlock(&coder->cv_mu);
 	log_print(coder, "has taken a dongle");
 	log_print(coder, "has taken a dongle");
 	return (1);

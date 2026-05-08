@@ -42,7 +42,7 @@ void	mark_coder_finished(t_app *all)
 	pthread_mutex_unlock(&all->req_mu);
 }
 
-static int	has_burned_out(t_app *all, int index, long long current_time)
+static int	has_burned_out(t_app *all, int index, long long current_time, int *all_finish)
 {
 	long long	time_to_die;
 	int			compile_count;
@@ -52,8 +52,11 @@ static int	has_burned_out(t_app *all, int index, long long current_time)
 	compile_count = all->coder[index].compile_count;
 	pthread_mutex_unlock(&all->coder[index].cv_mu);
 	if (compile_count >= all->parms.compiles_required)
+	{
+		*all_finish += 1;
 		return (0);
-	if (current_time <= time_to_die)
+	}
+	if (current_time < time_to_die)
 		return (0);
 	set_stop(all);
 	pthread_mutex_lock(&all->log_mutex);
@@ -68,19 +71,26 @@ void	*monitor_routine(void *arg)
 	t_all		*all;
 	long long	current_time;
 	int			index;
+	int			all_finish;
 
 	all = (t_app *)arg;
 	while (!should_stop(all))
 	{
 		current_time = get_time_in_ms();
 		index = 0;
+		all_finish = 0;
 		while (index < all->parms.num_coders)
 		{
-			if (has_burned_out(all, index, current_time))
+			if (has_burned_out(all, index, current_time, &all_finish))
 				return (NULL);
 			index++;
 		}
-		usleep(1000);
+		if (all_finish >= all->parms.num_coders)
+		{
+			set_stop(all);
+			return (NULL);
+		}
+		usleep(50);
 	}
 	return (NULL);
 }

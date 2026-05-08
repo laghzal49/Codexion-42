@@ -16,8 +16,8 @@ void	log_print(t_dev *coder, const char *action)
 {
 	long long	timestamp;
 
-	timestamp = get_time_in_ms() - coder->all->start_time_ms;
 	pthread_mutex_lock(&coder->all->log_mutex);
+	timestamp = get_time_in_ms() - coder->all->start_time_ms;
 	if (!should_stop(coder->all))
 		printf("%lld %lld %s\n", timestamp, coder->coder_id, action);
 	pthread_mutex_unlock(&coder->all->log_mutex);
@@ -40,6 +40,11 @@ static void	wait_for_start(t_dev *coder)
 	pthread_mutex_unlock(&coder->all->req_mu);
 }
 
+int	is_it_even(t_dev *coder)
+{
+	return (coder->coder_id % 2 == 0);
+}
+
 void	*coder_routine(void *arg)
 {
 	t_dev		*coder;
@@ -47,6 +52,8 @@ void	*coder_routine(void *arg)
 
 	coder = (t_dev *)arg;
 	wait_for_start(coder);
+	if (!is_it_even(coder))
+		smart_sleep((coder->all->parms.time_to_compile / 4), coder->all);
 	while (!should_stop(coder->all))
 	{
 		pthread_mutex_lock(&coder->cv_mu);
@@ -54,9 +61,8 @@ void	*coder_routine(void *arg)
 			coder->all->parms.compiles_required);
 		pthread_mutex_unlock(&coder->cv_mu);
 		if (is_done)
-			break ;
+			mark_coder_finished(coder->all);
 		run_cycle(coder);
 	}
-	mark_coder_finished(coder->all);
 	return (NULL);
 }
