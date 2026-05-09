@@ -29,7 +29,7 @@ static int	validate_numeric_args(char **argv)
 			error_check += error_exit(ERR_OVERFLOW);
 		if (val > (long long)INT_MAX)
 			error_check += error_exit(ERR_TOO_LARGE);
-		if (index <= 3 && val <= 0)
+		if (index <= 3 && val < 0)
 			error_check += error_exit(ERR_POSITIVE);
 		if (index >= 4 && val < 0)
 			error_check += error_exit(ERR_NON_NEG);

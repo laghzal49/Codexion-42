@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
+#include <pthread.h>
 
 static int	insert_in_heaps(t_dev *coder, t_tool *first, t_tool *second)
 {

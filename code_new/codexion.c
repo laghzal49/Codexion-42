@@ -58,7 +58,7 @@ static int	run_app(int argc, char **argv)
 
 int	main(int argc, char **argv)
 {
-	if (run_app(argc, argv))
+	if (!run_app(argc, argv))
 		return (0);
 	return (1);
 }

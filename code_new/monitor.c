@@ -42,7 +42,8 @@ void	mark_coder_finished(t_app *all)
 	pthread_mutex_unlock(&all->req_mu);
 }
 
-static int	has_burned_out(t_app *all, int index, long long current_time, int *all_finish)
+static int	has_burned_out(t_app *all, int index, long long current_time,
+	int *all_finish)
 {
 	long long	time_to_die;
 	int			compile_count;
@@ -83,14 +84,14 @@ void	*monitor_routine(void *arg)
 		{
 			if (has_burned_out(all, index, current_time, &all_finish))
 				return (NULL);
-			index++;
+			index += 2;
 		}
 		if (all_finish >= all->parms.num_coders)
 		{
 			set_stop(all);
 			return (NULL);
 		}
-		usleep(50);
+		smart_sleep(10, all);
 	}
 	return (NULL);
 }

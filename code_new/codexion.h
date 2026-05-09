@@ -143,5 +143,4 @@ void			bubble_down(t_scheduler *heap, int index, int size);
 void			heap_remove_at(t_scheduler *heap, int index);
 int				heap_find_index(t_scheduler *heap, t_dev *coder);
 void			lock_mutex(t_tool *first, t_tool *second, int lock, int heap);
-
 #endif
