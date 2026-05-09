@@ -14,19 +14,24 @@
 
 static int	is_higher_priority(t_scheduler *heap, t_dev *a, t_dev *b)
 {
-	if (!heap->is_edf)
+	long long	first;
+	long long	second;
+
+	pthread_mutex_lock(&a->data_mutex);
+	pthread_mutex_lock(&b->data_mutex);
+	if (heap->is_edf == FIFO)
 	{
-		if (a->request_seq == b->request_seq)
-			return (a->coder_id < b->coder_id);
-		return (a->request_seq < b->request_seq);
+		first = a->request_seq;
+		second = b->request_seq;
 	}
-	if (a->time_to_die == b->time_to_die)
+	else
 	{
-		if (a->request_seq == b->request_seq)
-			return (a->coder_id < b->coder_id);
-		return (a->request_seq < b->request_seq);
+		first = a->time_to_die;
+		second = b->time_to_die;
 	}
-	return (a->time_to_die < b->time_to_die);
+	pthread_mutex_unlock(&a->data_mutex);
+	pthread_mutex_unlock(&b->data_mutex);
+	return (first < second);
 }
 
 void	bubble_up(t_scheduler *heap, int idx)

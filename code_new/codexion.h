@@ -95,6 +95,7 @@ typedef struct s_dev
 	pthread_mutex_t	cv_mu;
 	int				compile_count;
 	t_app			*all;
+	pthread_mutex_t	data_mutex;
 }t_dev;
 
 typedef t_app				t_all;
@@ -141,5 +142,6 @@ void			bubble_up(t_scheduler *heap, int index);
 void			bubble_down(t_scheduler *heap, int index, int size);
 void			heap_remove_at(t_scheduler *heap, int index);
 int				heap_find_index(t_scheduler *heap, t_dev *coder);
+void			lock_mutex(t_tool *first, t_tool *second, int lock, int heap);
 
 #endif

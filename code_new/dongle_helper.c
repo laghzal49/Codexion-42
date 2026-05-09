@@ -59,3 +59,27 @@ void	cleanup_heaps_locked(t_dev *coder)
 	heap_remove_at(coder->right_dongle->heap,
 		heap_find_index(coder->right_dongle->heap, coder));
 }
+
+void	lock_mutex(t_tool *first, t_tool *second, int lock, int heap)
+{
+	if (lock == 0)
+	{
+		if (heap == 1)
+		{
+			pthread_mutex_lock(&first->heap_mutex);
+			pthread_mutex_lock(&second->heap_mutex);
+		}
+		pthread_mutex_lock(&first->mutex);
+		pthread_mutex_lock(&second->mutex);
+	}
+	else
+	{
+		pthread_mutex_unlock(&second->mutex);
+		pthread_mutex_unlock(&first->mutex);
+		if (heap == 1)
+		{
+			pthread_mutex_unlock(&second->heap_mutex);
+			pthread_mutex_unlock(&first->heap_mutex);
+		}
+	}
+}

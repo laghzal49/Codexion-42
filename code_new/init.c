@@ -31,6 +31,7 @@ static int	init_alloc(t_app *all)
 	all->dongles = malloc(sizeof(t_tool) * all->parms.num_coders);
 	if (!all->dongles)
 		return (1);
+	memset(all->dongles, 0, sizeof(t_tool) * all->parms.num_coders);
 	all->coder = malloc(sizeof(t_dev) * all->parms.num_coders);
 	if (!all->coder)
 	{
@@ -38,6 +39,7 @@ static int	init_alloc(t_app *all)
 		all->dongles = NULL;
 		return (1);
 	}
+	memset(all->coder, 0, sizeof(t_dev) * all->parms.num_coders);
 	return (0);
 }
 
@@ -54,6 +56,8 @@ static int	init_dongles(t_app *all)
 		pthread_mutex_init(&all->dongles[index].mutex, NULL);
 		all->dongles[index].heap = heap_init(2, all->parms.is_edf);
 		if (!all->dongles[index].heap)
+			return (1);
+		if (pthread_mutex_init(&all->dongles[index].heap_mutex, NULL) != 0)
 			return (1);
 		if (pthread_mutex_init(&all->dongles[index].heap_mutex, NULL) != 0)
 			return (1);

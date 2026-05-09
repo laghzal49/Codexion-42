@@ -49,3 +49,13 @@ int	heap_find_index(t_scheduler *heap, t_dev *coder)
 	}
 	return (-1);
 }
+
+int	heap_insert(t_scheduler *heap, t_dev *coder)
+{
+	if (!heap || !coder || heap_is_full(heap))
+		return (0);
+	heap->items[heap->size] = coder;
+	bubble_up(heap, heap->size);
+	heap->size++;
+	return (1);
+}

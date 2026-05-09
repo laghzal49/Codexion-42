@@ -25,6 +25,8 @@ void	log_print(t_dev *coder, const char *action)
 
 static void	run_cycle(t_dev *coder)
 {
+	if (coder->left_dongle == coder->right_dongle)
+		return ;
 	if (!request_dongles(coder))
 		return ;
 	coder_compile(coder);
