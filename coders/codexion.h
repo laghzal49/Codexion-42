@@ -116,6 +116,7 @@ void			lock_order(t_dev *coder, t_tool **first, t_tool **second);
 long long		next_seq(t_dev *coder);
 void			cleanup_heaps_locked(t_dev *coder);
 
+int				join_coder_threads(t_app *all, int end);
 int				should_stop(t_app *all);
 void			set_stop(t_app *all);
 void			mark_coder_finished(t_app *all);

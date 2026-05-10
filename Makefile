@@ -1,9 +1,9 @@
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -pthread -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -pthread
 NAME = codexion
-SRCS = code_new/clean_all.c code_new/coder.c code_new/monitor.c code_new/codexion.c code_new/dongle.c code_new/dongle_helper.c code_new/heap.c code_new/heap_utils.c code_new/init.c code_new/parsing.c code_new/starter.c code_new/state.c code_new/time.c code_new/utils.c
+SRCS = coders/clean_all.c coders/coder.c coders/monitor.c coders/codexion.c coders/dongle.c coders/dongle_helper.c coders/heap.c coders/heap_utils.c coders/init.c coders/parsing.c coders/starter.c coders/state.c coders/time.c coders/utils.c
 OBJS = $(SRCS:.c=.o)
-HEADERS = code_new/codexion.h
+HEADERS = coders/codexion.h
 
 all: $(NAME)
 

@@ -91,7 +91,7 @@ void	*monitor_routine(void *arg)
 			set_stop(all);
 			return (NULL);
 		}
-		smart_sleep(10, all);
+		smart_sleep(1, all);
 	}
 	return (NULL);
 }

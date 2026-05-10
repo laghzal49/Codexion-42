@@ -44,8 +44,7 @@ static int	create_coder_threads(t_app *all)
 				coder_routine, &all->coder[i]) != 0)
 		{
 			set_stop(all);
-			while (i-- > 0)
-				pthread_join(all->coder[i].thread, NULL);
+			join_coder_threads(all, i);
 			return (1);
 		}
 		i++;
@@ -53,17 +52,19 @@ static int	create_coder_threads(t_app *all)
 	return (0);
 }
 
-static int	join_coder_threads(t_app *all)
+int	join_coder_threads(t_app *all, int end)
 {
 	int	i;
 
 	i = 0;
-	while (i < all->parms.num_coders)
+	if (!end)
+		end = all->parms.num_coders;
+	while (i < end)
 	{
 		if (pthread_join(all->coder[i].thread, NULL) != 0)
 		{
 			set_stop(all);
-			while (++i < all->parms.num_coders)
+			while (++i < end)
 				pthread_join(all->coder[i].thread, NULL);
 			return (1);
 		}
@@ -83,10 +84,10 @@ int	start_and_join_coders(t_app *all)
 	if (pthread_create(&all->monitor_thread, NULL, monitor_routine, all) != 0)
 	{
 		set_stop(all);
-		join_coder_threads(all);
+		join_coder_threads(all, 0);
 		return (1);
 	}
-	if (join_coder_threads(all) != 0)
+	if (join_coder_threads(all, 0) != 0)
 	{
 		pthread_join(all->monitor_thread, NULL);
 		return (1);
