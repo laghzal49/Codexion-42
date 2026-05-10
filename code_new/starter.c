@@ -22,10 +22,10 @@ static void	set_start_state(t_app *all)
 	i = 0;
 	while (i < all->parms.num_coders)
 	{
-		pthread_mutex_lock(&all->coder[i].data_mutex);
+		pthread_mutex_lock(&all->coder[i].cv_mu);
 		all->coder[i].time_to_die = all->start_time_ms + \
 			all->parms.time_to_burnout;
-		pthread_mutex_unlock(&all->coder[i].data_mutex);
+		pthread_mutex_unlock(&all->coder[i].cv_mu);
 		i++;
 	}
 	pthread_mutex_lock(&all->req_mu);

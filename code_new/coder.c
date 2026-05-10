@@ -42,28 +42,26 @@ static void	wait_for_start(t_dev *coder)
 	pthread_mutex_unlock(&coder->all->req_mu);
 }
 
-int	is_it_even(t_dev *coder)
-{
-	return (coder->coder_id % 2 == 0);
-}
-
 void	*coder_routine(void *arg)
 {
 	t_dev		*coder;
-	int			is_done;
+	int			is_finished;
 
 	coder = (t_dev *)arg;
 	wait_for_start(coder);
-	if (!is_it_even(coder))
+	if (coder->coder_id % 2 != 0)
 		smart_sleep((coder->all->parms.time_to_compile / 4), coder->all);
+	is_finished = 0;
 	while (!should_stop(coder->all))
 	{
 		pthread_mutex_lock(&coder->cv_mu);
-		is_done = (coder->compile_count >= \
-			coder->all->parms.compiles_required);
-		pthread_mutex_unlock(&coder->cv_mu);
-		if (is_done)
+		if (coder->compile_count >= coder->all->parms.compiles_required \
+			&& !is_finished)
+		{
 			mark_coder_finished(coder->all);
+			is_finished = 1;
+		}
+		pthread_mutex_unlock(&coder->cv_mu);
 		run_cycle(coder);
 	}
 	return (NULL);

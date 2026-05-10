@@ -59,8 +59,6 @@ static int	init_dongles(t_app *all)
 			return (1);
 		if (pthread_mutex_init(&all->dongles[index].heap_mutex, NULL) != 0)
 			return (1);
-		if (pthread_mutex_init(&all->dongles[index].heap_mutex, NULL) != 0)
-			return (1);
 		all->dongles[index].heap_mutex_ready = 1;
 		index++;
 	}

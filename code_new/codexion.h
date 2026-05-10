@@ -95,7 +95,6 @@ typedef struct s_dev
 	pthread_mutex_t	cv_mu;
 	int				compile_count;
 	t_app			*all;
-	pthread_mutex_t	data_mutex;
 }t_dev;
 
 typedef t_app				t_all;

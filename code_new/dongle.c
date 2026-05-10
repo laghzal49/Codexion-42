@@ -34,7 +34,7 @@ static int	try_take(t_dev *coder, t_tool *first, t_tool *second)
 		|| now < first->cooldown || now < second->cooldown)
 	{
 		lock_mutex(first, second, 1, 1);
-		usleep(100);
+		usleep(1000);
 		return (0);
 	}
 	first->in_use = 1;

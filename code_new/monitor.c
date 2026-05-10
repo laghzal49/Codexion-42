@@ -84,7 +84,7 @@ void	*monitor_routine(void *arg)
 		{
 			if (has_burned_out(all, index, current_time, &all_finish))
 				return (NULL);
-			index += 2;
+			index++;
 		}
 		if (all_finish >= all->parms.num_coders)
 		{

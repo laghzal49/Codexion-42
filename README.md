@@ -1,6 +1,6 @@
 *This project has been created as part of the 42 curriculum by tlaghzal*
 
-# Chapter VII — Codexion
+# Codexion
 
 Codexion is a concurrency simulation where multiple coders compete for shared “dongles” under strict burnout deadlines. Each coder must acquire two dongles before compiling, then releases them and goes through debugging and refactoring phases. The simulation supports FIFO and EDF (earliest deadline first) scheduling to decide which coder gets priority when resources are contested.
 

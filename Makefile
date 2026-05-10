@@ -1,5 +1,5 @@
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -pthread 
+CFLAGS = -Wall -Wextra -Werror -pthread -fsanitize=address
 NAME = codexion
 SRCS = code_new/clean_all.c code_new/coder.c code_new/monitor.c code_new/codexion.c code_new/dongle.c code_new/dongle_helper.c code_new/heap.c code_new/heap_utils.c code_new/init.c code_new/parsing.c code_new/starter.c code_new/state.c code_new/time.c code_new/utils.c
 OBJS = $(SRCS:.c=.o)
