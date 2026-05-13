@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/12 19:16:10 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/05/07 12:00:00 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/05/13 13:53:42 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,10 @@
 
 # define FIFO 0
 # define EDF 1
+# define SUCCESS 0
+# define FAIL 1
+# define LOCK 1
+# define UNLOCK 0
 # define ERR_USAGE_1 "Usage: ./codexion number_of_coders time_to_burnout"
 # define ERR_USAGE_2 " time_to_compile time_to_debug time_to_refactor"
 # define ERR_USAGE_3 " number_of_compiles_required dongle_cooldown scheduler\n"
@@ -30,8 +34,7 @@
 # define ERR_NOT_NUMBER "Error: only integers allowed (no floats or letters).\n"
 # define ERR_OVERFLOW "Error: Value overflows long long maximum.\n"
 # define ERR_TOO_LARGE "Error: Value exceeds maximum allowed (2147483647).\n"
-# define ERR_POSITIVE "Error: args 1-3 (coders/burnout/compile) must be > 0.\n"
-# define ERR_NON_NEG "Error: args 4-7 must be >= 0.\n"
+# define ERR_NON_NEG "Error: args 0-7 must be > 0.\n"
 
 typedef struct s_dev		t_dev;
 typedef struct s_scheduler	t_scheduler;
@@ -56,6 +59,7 @@ typedef struct s_tool
 	t_scheduler		*heap;
 	pthread_mutex_t	heap_mutex;
 	int				heap_mutex_ready;
+	int				mutex_ready;
 }t_tool;
 
 typedef struct s_scheduler
@@ -73,8 +77,6 @@ typedef struct s_app
 	t_dev			*coder;
 	pthread_t		monitor_thread;
 	long long		start_time_ms;
-	int				finished_coders;
-	long long		request_seq;
 	int				stop_requested;
 	pthread_mutex_t	req_mu;
 	pthread_cond_t	req_cv;
@@ -90,11 +92,12 @@ typedef struct s_dev
 	long long		time_to_die;
 	t_tool			*left_dongle;
 	t_tool			*right_dongle;
-	long long		request_seq;
+	long long		request_time;
 	pthread_t		thread;
 	pthread_mutex_t	cv_mu;
 	int				compile_count;
 	t_app			*all;
+	int				cv_mu_ready;
 }t_dev;
 
 typedef t_app				t_all;
@@ -113,13 +116,11 @@ void			put_dongle(t_dev *coder);
 
 int				is_top_of_heap(t_tool *dongle, t_dev *coder);
 void			lock_order(t_dev *coder, t_tool **first, t_tool **second);
-long long		next_seq(t_dev *coder);
 void			cleanup_heaps_locked(t_dev *coder);
 
 int				join_coder_threads(t_app *all, int end);
 int				should_stop(t_app *all);
 void			set_stop(t_app *all);
-void			mark_coder_finished(t_app *all);
 
 void			cleanup_all(t_app *all);
 void			cleanup_dongles(t_app *all, int num_coders);
@@ -142,5 +143,6 @@ void			bubble_up(t_scheduler *heap, int index);
 void			bubble_down(t_scheduler *heap, int index, int size);
 void			heap_remove_at(t_scheduler *heap, int index);
 int				heap_find_index(t_scheduler *heap, t_dev *coder);
-void			lock_mutex(t_tool *first, t_tool *second, int lock, int heap);
+void			lock_dongles(t_tool *first, t_tool *second, int heap);
+void			unlock_dongles(t_tool *first, t_tool *second, int heap);
 #endif

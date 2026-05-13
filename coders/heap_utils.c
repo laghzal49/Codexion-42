@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/07 10:00:00 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/05/07 10:00:00 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/05/13 13:53:46 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,9 @@ int	heap_find_index(t_scheduler *heap, t_dev *coder)
 int	heap_insert(t_scheduler *heap, t_dev *coder)
 {
 	if (!heap || !coder || heap_is_full(heap))
-		return (0);
+		return (FAIL);
 	heap->items[heap->size] = coder;
 	bubble_up(heap, heap->size);
 	heap->size++;
-	return (1);
+	return (SUCCESS);
 }

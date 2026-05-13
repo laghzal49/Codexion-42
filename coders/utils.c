@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/14 23:05:32 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/24 13:53:46 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/05/13 12:54:02 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	ft_strlen(const char *s)
 int	error_exit(const char *msg)
 {
 	write(2, msg, (size_t)ft_strlen(msg));
-	return (1);
+	return (FAIL);
 }
 
 int	valdite_number(const char *s)
@@ -36,14 +36,14 @@ int	valdite_number(const char *s)
 	if (s[i] == '+' || s[i] == '-')
 		i++;
 	if (!s[i])
-		return (1);
+		return (FAIL);
 	while (s[i])
 	{
 		if (s[i] < '0' || s[i] > '9')
-			return (1);
+			return (FAIL);
 		i++;
 	}
-	return (0);
+	return (SUCCESS);
 }
 
 long long	ft_atol(const char *str)

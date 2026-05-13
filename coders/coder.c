@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/22 17:45:23 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/28 18:18:42 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/05/13 13:59:41 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ static void	run_cycle(t_dev *coder)
 {
 	if (coder->left_dongle == coder->right_dongle)
 		return ;
-	if (!request_dongles(coder))
+	if (request_dongles(coder) != SUCCESS)
 		return ;
 	coder_compile(coder);
 	if (!should_stop(coder->all))
@@ -45,24 +45,12 @@ static void	wait_for_start(t_dev *coder)
 void	*coder_routine(void *arg)
 {
 	t_dev		*coder;
-	int			is_finished;
 
 	coder = (t_dev *)arg;
 	wait_for_start(coder);
-	if (coder->coder_id % 2 != 0)
+	if (coder->coder_id % 2 == 0)
 		smart_sleep((coder->all->parms.time_to_compile / 4), coder->all);
-	is_finished = 0;
 	while (!should_stop(coder->all))
-	{
-		pthread_mutex_lock(&coder->cv_mu);
-		if (coder->compile_count >= coder->all->parms.compiles_required \
-			&& !is_finished)
-		{
-			mark_coder_finished(coder->all);
-			is_finished = 1;
-		}
-		pthread_mutex_unlock(&coder->cv_mu);
 		run_cycle(coder);
-	}
 	return (NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: tlaghzal <tlaghzal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/04/24 14:06:00 by tlaghzal          #+#    #+#             */
-/*   Updated: 2026/04/28 18:17:58 by tlaghzal         ###   ########.fr       */
+/*   Updated: 2026/05/13 12:39:57 by tlaghzal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,22 @@
 
 static int	is_higher_priority(t_scheduler *heap, t_dev *a, t_dev *b)
 {
-	long long	first;
-	long long	second;
-
 	if (heap->is_edf == FIFO)
 	{
-		first = a->request_seq;
-		second = b->request_seq;
+		if (a->request_time == b->request_time)
+			return (a->coder_id < b->coder_id);
+		return (a->request_time < b->request_time);
 	}
 	else
 	{
-		first = a->time_to_die;
-		second = b->time_to_die;
-		if (first == second)
+		if (a->time_to_die == b->time_to_die)
 		{
-			first = a->coder_id;
-			second = b->coder_id;
+			if (a->compile_count == b->compile_count)
+				return (a->coder_id < b->coder_id);
+			return (a->compile_count < b->compile_count);
 		}
+		return (a->time_to_die < b->time_to_die);
 	}
-	return (first < second);
 }
 
 void	bubble_up(t_scheduler *heap, int idx)

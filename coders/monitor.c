@@ -30,18 +30,6 @@ void	set_stop(t_app *all)
 	pthread_mutex_unlock(&all->req_mu);
 }
 
-void	mark_coder_finished(t_app *all)
-{
-	pthread_mutex_lock(&all->req_mu);
-	all->finished_coders++;
-	if (all->finished_coders >= all->parms.num_coders)
-	{
-		all->stop_requested = 1;
-		pthread_cond_broadcast(&all->req_cv);
-	}
-	pthread_mutex_unlock(&all->req_mu);
-}
-
 static int	has_burned_out(t_app *all, int index, long long current_time,
 	int *all_finish)
 {
@@ -91,7 +79,7 @@ void	*monitor_routine(void *arg)
 			set_stop(all);
 			return (NULL);
 		}
-		smart_sleep(1, all);
+		smart_sleep(5, all);
 	}
 	return (NULL);
 }
