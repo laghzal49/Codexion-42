@@ -84,7 +84,6 @@ void	heap_remove_at(t_scheduler *heap, int index)
 	if (index == heap->size)
 		return ;
 	heap->items[index] = heap->items[heap->size];
-	bubble_up(heap, index);
 	bubble_down(heap, index, heap->size);
 }
 

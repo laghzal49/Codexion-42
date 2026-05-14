@@ -41,7 +41,7 @@ static int	try_take(t_dev *coder, t_tool *first, t_tool *second)
 		|| now < first->cooldown || now < second->cooldown)
 	{
 		unlock_dongles(first, second, 1);
-		usleep(500);
+		usleep(50);
 		return (FAIL);
 	}
 	first->in_use = 1;

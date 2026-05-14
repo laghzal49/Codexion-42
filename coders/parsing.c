@@ -16,25 +16,21 @@ static int	validate_numeric_args(char **argv)
 {
 	int			index;
 	long long	val;
-	int			error_check;
 
 	index = 1;
-	error_check = 0;
 	while (index <= 7)
 	{
 		if (valdite_number(argv[index]) != SUCCESS)
-			error_check += error_exit(ERR_NOT_NUMBER);
+			return (error_exit(ERR_NOT_NUMBER));
 		val = ft_atol(argv[index]);
-		if (error_check == 0 && val == LLONG_MAX)
-			error_check += error_exit(ERR_OVERFLOW);
-		if (error_check == 0 && val > (long long)INT_MAX)
-			error_check += error_exit(ERR_TOO_LARGE);
-		if (error_check == 0 && val < 0)
-			error_check += error_exit(ERR_NON_NEG);
+		if (val == LLONG_MAX)
+			return (error_exit(ERR_OVERFLOW));
+		if (val > (long long)INT_MAX)
+			return (error_exit(ERR_TOO_LARGE));
+		if (val < 0)
+			return (error_exit(ERR_NON_NEG));
 		index++;
 	}
-	if (error_check != 0)
-		return (FAIL);
 	return (SUCCESS);
 }
 

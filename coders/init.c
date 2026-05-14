@@ -54,10 +54,11 @@ static int	init_dongles(t_app *all)
 		all->dongles[index].cooldown = 0;
 		all->dongles[index].heap_mutex_ready = 0;
 		all->dongles[index].mutex_ready = 0;
-		pthread_mutex_init(&all->dongles[index].mutex, NULL);
+		if (pthread_mutex_init(&all->dongles[index].mutex, NULL) != 0)
+			return (FAIL);
 		all->dongles[index].heap = heap_init(2, all->parms.is_edf);
 		if (!all->dongles[index].heap)
-			return (1);
+			return (FAIL);
 		if (pthread_mutex_init(&all->dongles[index].heap_mutex, NULL) != 0)
 			return (FAIL);
 		all->dongles[index].mutex_ready = 1;
