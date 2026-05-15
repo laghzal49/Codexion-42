@@ -22,6 +22,8 @@ static int	insert_in_heaps(t_dev *coder, t_tool *first, t_tool *second)
 	}
 	if (heap_insert(coder->right_dongle->heap, coder) != SUCCESS)
 	{
+		heap_remove_at(coder->left_dongle->heap,
+			heap_find_index(coder->left_dongle->heap, coder));
 		unlock_dongles(first, second, 1);
 		return (FAIL);
 	}

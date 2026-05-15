@@ -25,13 +25,13 @@ long long	get_time_in_ms(void)
 
 void	smart_sleep(long long time_to_sleep, t_all *all)
 {
-	struct timespec	wait_time;
-	long long		end_time_ms;
+	long long	start_time;
 
-	end_time_ms = get_time_in_ms() + time_to_sleep;
-	wait_time.tv_sec = end_time_ms / 1000;
-	wait_time.tv_nsec = (end_time_ms % 1000) * 1000000;
-	pthread_mutex_lock(&all->req_mu);
-	pthread_cond_timedwait(&all->req_cv, &all->req_mu, &wait_time);
-	pthread_mutex_unlock(&all->req_mu);
+	start_time = get_time_in_ms();
+	while ((get_time_in_ms() - start_time) < time_to_sleep)
+	{
+		if (should_stop(all))
+			break ;
+		usleep(50);
+	}
 }
