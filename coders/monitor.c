@@ -33,6 +33,7 @@ void	set_stop(t_app *all)
 static int	has_burned_out(t_app *all, int index, long long current_time,
 	int *all_finish)
 {
+	long long	burn;
 	long long	time_to_die;
 	int			compile_count;
 
@@ -48,8 +49,11 @@ static int	has_burned_out(t_app *all, int index, long long current_time,
 	if (current_time < time_to_die)
 		return (0);
 	set_stop(all);
+	pthread_mutex_lock(&all->req_mu);
+	burn = get_time_in_ms() - all->start_time_ms;
+	pthread_mutex_unlock(&all->req_mu);
 	pthread_mutex_lock(&all->log_mutex);
-	printf("%lld %lld burned out\n", get_time_in_ms() - all->start_time_ms,
+	printf("%lld %lld burned out\n", burn,
 		all->coder[index].coder_id);
 	pthread_mutex_unlock(&all->log_mutex);
 	return (1);

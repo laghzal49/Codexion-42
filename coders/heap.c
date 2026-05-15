@@ -25,7 +25,7 @@ static int	is_higher_priority(t_scheduler *heap, t_dev *a, t_dev *b)
 		if (a->time_to_die == b->time_to_die)
 		{
 			if (a->compile_count == b->compile_count)
-				return (a->coder_id < b->coder_id);
+				return (a->request_time < b->request_time);
 			return (a->compile_count < b->compile_count);
 		}
 		return (a->time_to_die < b->time_to_die);

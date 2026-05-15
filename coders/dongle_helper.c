@@ -68,6 +68,6 @@ void	unlock_dongles(t_tool *first, t_tool *second, int heap_lock)
 		pthread_mutex_unlock(&second->heap_mutex);
 		pthread_mutex_unlock(&first->heap_mutex);
 	}
-		pthread_mutex_unlock(&second->mutex);
-		pthread_mutex_unlock(&first->mutex);
+	pthread_mutex_unlock(&second->mutex);
+	pthread_mutex_unlock(&first->mutex);
 }
