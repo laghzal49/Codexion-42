@@ -27,8 +27,12 @@ static void	set_start_state(t_app *all)
 		pthread_mutex_unlock(&all->coder[i].cv_mu);
 		i++;
 	}
+}
+
+static void	brodcast_start(t_app *all)
+{
 	pthread_mutex_lock(&all->req_mu);
-	all->start_time_ms = start_ms;
+	all->start_time_ms = get_time_in_ms();
 	pthread_cond_broadcast(&all->req_cv);
 	pthread_mutex_unlock(&all->req_mu);
 }
@@ -87,6 +91,7 @@ int	start_and_join_coders(t_app *all)
 		join_coder_threads(all, 0);
 		return (FAIL);
 	}
+	brodcast_start(all);
 	if (join_coder_threads(all, 0) != SUCCESS)
 	{
 		pthread_join(all->monitor_thread, NULL);
