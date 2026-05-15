@@ -38,7 +38,7 @@ static int	run_app(int argc, char **argv)
 {
 	t_app	*all;
 
-	all = malloc(sizeof(t_app));
+	all = ft_malloc(sizeof(t_app));
 	if (!all)
 		return (FAIL);
 	memset(all, 0, sizeof(t_app));

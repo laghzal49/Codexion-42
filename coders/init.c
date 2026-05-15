@@ -28,14 +28,13 @@ static int	init_sync(t_app *all)
 
 static int	init_alloc(t_app *all)
 {
-	all->dongles = malloc(sizeof(t_tool) * all->parms.num_coders);
+	all->dongles = ft_malloc(sizeof(t_tool) * all->parms.num_coders);
 	if (!all->dongles)
 		return (FAIL);
 	memset(all->dongles, 0, sizeof(t_tool) * all->parms.num_coders);
-	all->coder = malloc(sizeof(t_dev) * all->parms.num_coders);
+	all->coder = ft_malloc(sizeof(t_dev) * all->parms.num_coders);
 	if (!all->coder)
 	{
-		free(all->dongles);
 		all->dongles = NULL;
 		return (FAIL);
 	}
@@ -94,13 +93,12 @@ static int	init_coders(t_app *all)
 
 int	init_all(t_app *all)
 {
-	if (init_sync(all) != SUCCESS)
-		return (FAIL);
-	if (init_alloc(all) != SUCCESS || init_dongles(all) != SUCCESS
+	if (init_sync(all) || init_alloc(all) != SUCCESS
+		|| init_dongles(all) != SUCCESS
 		|| init_coders(all) != SUCCESS)
 	{
 		cleanup_dongles(all, all->parms.num_coders);
-		free(all->coder);
+		all->dongles = NULL;
 		all->coder = NULL;
 		return (FAIL);
 	}

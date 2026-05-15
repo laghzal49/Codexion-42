@@ -93,15 +93,12 @@ t_scheduler	*heap_init(int max_size, int is_edf)
 
 	if (max_size <= 0)
 		return (NULL);
-	heap = malloc(sizeof(t_scheduler));
+	heap = ft_malloc(sizeof(t_scheduler));
 	if (!heap)
 		return (NULL);
-	heap->items = malloc(sizeof(t_dev *) * max_size);
+	heap->items = ft_malloc(sizeof(t_dev *) * max_size);
 	if (!heap->items)
-	{
-		free(heap);
 		return (NULL);
-	}
 	heap->max_size = max_size;
 	heap->size = 0;
 	heap->is_edf = is_edf;

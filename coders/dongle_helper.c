@@ -49,7 +49,6 @@ void	cleanup_heaps_locked(t_dev *coder)
 		heap_find_index(coder->right_dongle->heap, coder));
 }
 
-
 void	lock_dongles(t_tool *first, t_tool *second, int heap_lock)
 {
 	if (heap_lock)

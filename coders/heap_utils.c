@@ -26,14 +26,6 @@ int	heap_is_full(t_scheduler *heap)
 	return (heap->size >= heap->max_size);
 }
 
-void	heap_destroy(t_scheduler *heap)
-{
-	if (!heap)
-		return ;
-	free(heap->items);
-	free(heap);
-}
-
 int	heap_find_index(t_scheduler *heap, t_dev *coder)
 {
 	int	i;
