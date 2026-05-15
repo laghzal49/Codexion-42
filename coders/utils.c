@@ -45,7 +45,7 @@ int	valdite_number(const char *s)
 	}
 	return (SUCCESS);
 }
-#include <stdio.h>
+
 long long	ft_atol(const char *str)
 {
 	long long	res;
@@ -68,10 +68,7 @@ long long	ft_atol(const char *str)
 	{
 		digit = str[i] - '0';
 		if (res > (LLONG_MAX - digit) / 10)
-		{
-			printf("Overflow %lld", res);
 			return (LLONG_MAX);
-		}
 		res = res * 10 + digit;
 		i++;
 	}
